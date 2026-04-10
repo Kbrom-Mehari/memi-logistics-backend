@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:18
+    container_name: memi-logistics-postgres
+    restart: always
+    environment:
+      POSTGRES_USER: kbrom
+      POSTGRES_PASSWORD: k27b12m19
+      POSTGRES_DB: auth_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - memi_pg_data:/var/lib/postgresql/data
+
+volumes:
+  memi_pg_data:
