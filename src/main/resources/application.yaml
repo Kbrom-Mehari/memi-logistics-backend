@@ -1,0 +1,17 @@
+spring:
+  application:
+    name: memi-logistics-backend
+  profiles:
+    active: dev
+  datasource:
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+application:
+  security:
+    jwt:
+      headers:
+        refresh: Refresh-Token
+        bearer-prefix: Bearer
