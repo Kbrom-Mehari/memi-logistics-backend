@@ -18,3 +18,5 @@ application:
       secret-key: ${JWT_SECRET}
       expiration: 900000 # 15 minutes for security in prod
     refresh-token-expiration: 604800000 # 7 days
+server:
+  port: ${PORT:8080}
