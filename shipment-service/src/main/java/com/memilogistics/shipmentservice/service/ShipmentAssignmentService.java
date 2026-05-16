@@ -1,5 +1,7 @@
 package com.memilogistics.shipmentservice.service;
 
+import com.memilogistics.commonsecurity.annotation.CurrentUser;
+import com.memilogistics.commonsecurity.principal.CustomUserPrincipal;
 import com.memilogistics.shipmentservice.dto.AssignCarrierRequest;
 import com.memilogistics.shipmentservice.dto.CancelShipmentOfferRequest;
 import com.memilogistics.shipmentservice.dto.ShipmentOfferRequest;
@@ -16,6 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Service
@@ -26,19 +29,19 @@ public class ShipmentAssignmentService {
     private final CarrierCompanyRepository carrierCompanyRepository;
 
     @Transactional
-    public void offerShipment(ShipmentOfferRequest request) {
+    public void offerShipment(Long shipmentId, @CurrentUser CustomUserPrincipal user, BigDecimal price) {
         ShipmentOffer shipmentOffer = new ShipmentOffer();
-        Shipment shipment = shipmentRepository.findById(request.getShipmentId()).
+        Shipment shipment = shipmentRepository.findById(shipmentId).
                 orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND, "shipment with id " + request.getShipmentId() + " not found"
+                        HttpStatus.NOT_FOUND, "shipment with id " + shipmentId + " not found"
                 ));
 
-        CarrierCompany carrierCompany = carrierCompanyRepository.findById(request.getCarrierCompanyId())
+        CarrierCompany carrierCompany = carrierCompanyRepository.findByManagerEmail(user.getUsername())
                 .orElseThrow(()-> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND, "carrier company with id " + request.getCarrierCompanyId() + " not found"
+                        HttpStatus.NOT_FOUND, "carrier company not found"
                 ));
 
-        shipmentOffer.setPrice(request.getPrice());
+        shipmentOffer.setPrice(price);
         shipmentOffer.setCreatedAt(LocalDateTime.now());
         shipmentOffer.setShipment(shipment);
         shipmentOffer.setCarrierCompany(carrierCompany);
@@ -51,17 +54,18 @@ public class ShipmentAssignmentService {
     }
 
     @Transactional
-    public void cancelShipmentOffer(CancelShipmentOfferRequest request){
-        ShipmentOffer shipmentOffer = shipmentOfferRepository.findById(request.getShipmentOfferId())
+    public void cancelShipmentOffer(Long shipmentOfferId, @CurrentUser CustomUserPrincipal user){
+        ShipmentOffer shipmentOffer = shipmentOfferRepository.findById(shipmentOfferId)
                 .orElseThrow(
                         ()-> new ResponseStatusException(
-                                HttpStatus.NOT_FOUND, "offer with id " + request.getShipmentOfferId() + " not found"
+                                HttpStatus.NOT_FOUND, "offer with id " + shipmentOfferId + " not found"
                         )
                 );
-        CarrierCompany carrierCompany = carrierCompanyRepository.findById(request.getCarrierId())
+
+        CarrierCompany carrierCompany = carrierCompanyRepository.findByManagerEmail(user.getUsername())
                 .orElseThrow(
                         ()-> new ResponseStatusException(
-                                HttpStatus.NOT_FOUND, "carrier company with id " + request.getCarrierId() + " not found"
+                                HttpStatus.NOT_FOUND, "carrier company not found"
                         )
                 );
 
@@ -82,17 +86,17 @@ public class ShipmentAssignmentService {
     }
 
     @Transactional
-    public void assignCarrier(AssignCarrierRequest request){
-        Shipment shipment = shipmentRepository.findById(request.getShipmentId())
+    public void assignCarrier(Long shipmentId, Long carrierId) {
+        Shipment shipment = shipmentRepository.findById(shipmentId)
                 .orElseThrow(
                         ()-> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND, "Shipment with id " + request.getShipmentId() + " not found"
+                        HttpStatus.NOT_FOUND, "Shipment with id " + shipmentId + " not found"
                         )
                 );
-        CarrierCompany carrierCompany = carrierCompanyRepository.findById(request.getCarrierId())
+        CarrierCompany carrierCompany = carrierCompanyRepository.findById(carrierId)
                 .orElseThrow(
                         ()-> new ResponseStatusException(
-                                HttpStatus.NOT_FOUND, "carrier company with id " + request.getCarrierId() + " not found"
+                                HttpStatus.NOT_FOUND, "carrier company with id " + carrierId + " not found"
                         )
                 );
 

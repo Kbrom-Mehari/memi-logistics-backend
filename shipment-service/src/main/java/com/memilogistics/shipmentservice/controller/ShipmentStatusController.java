@@ -1,5 +1,7 @@
 package com.memilogistics.shipmentservice.controller;
 
+import com.memilogistics.commonsecurity.annotation.CurrentUser;
+import com.memilogistics.commonsecurity.principal.CustomUserPrincipal;
 import com.memilogistics.shipmentservice.dto.StatusUpdateRequest;
 import com.memilogistics.shipmentservice.entity.Shipment;
 import com.memilogistics.shipmentservice.service.ShipmentStatusService;
@@ -16,15 +18,16 @@ public class ShipmentStatusController {
     private final ShipmentStatusService shipmentStatusService;
 
 
-    @PatchMapping("/{id}/update-status")
-    public ResponseEntity<Shipment> updateShipmentStatus(@PathVariable Long id,
-                                                         @RequestBody StatusUpdateRequest request
-    ) {
+    @PatchMapping("/{shipmentId}/update-status")
+    public ResponseEntity<Shipment> updateShipmentStatus(@PathVariable("shipmentId") Long id,
+                                                         @RequestBody StatusUpdateRequest request,
+                                                         @CurrentUser CustomUserPrincipal user
+                                                         ) {
         if (request == null || request.getStatus() == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Shipment status is required");
         }
         try {
-            return ResponseEntity.ok(shipmentStatusService.updateShipmentStatus(id, request));
+            return ResponseEntity.ok(shipmentStatusService.updateShipmentStatus(id, request, user));
         } catch (IllegalArgumentException ex) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, ex.getMessage(), ex);
         }

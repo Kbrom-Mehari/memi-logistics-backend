@@ -7,7 +7,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class StatusUpdateRequest {
-    private Long carrierId;
     private String location;
     private ShipmentStatus status;
 }

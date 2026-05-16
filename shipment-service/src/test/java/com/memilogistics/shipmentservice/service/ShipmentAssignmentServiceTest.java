@@ -1,8 +1,6 @@
 package com.memilogistics.shipmentservice.service;
 
-import com.memilogistics.shipmentservice.dto.AssignCarrierRequest;
-import com.memilogistics.shipmentservice.dto.CancelShipmentOfferRequest;
-import com.memilogistics.shipmentservice.dto.ShipmentOfferRequest;
+import com.memilogistics.commonsecurity.principal.CustomUserPrincipal;
 import com.memilogistics.shipmentservice.entity.CarrierCompany;
 import com.memilogistics.shipmentservice.entity.Shipment;
 import com.memilogistics.shipmentservice.entity.ShipmentOffer;
@@ -20,8 +18,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -46,6 +44,7 @@ public class ShipmentAssignmentServiceTest {
     private Shipment sampleShipment;
     private CarrierCompany sampleCarrier;
     private ShipmentOffer sampleOffer;
+    private CustomUserPrincipal sampleUser;
 
     @BeforeEach
     void setUp() {
@@ -63,19 +62,17 @@ public class ShipmentAssignmentServiceTest {
         sampleOffer.setId(100L);
         sampleOffer.setShipment(sampleShipment);
         sampleOffer.setCarrierCompany(sampleCarrier);
+
+        sampleUser = new CustomUserPrincipal("manager@express.com", List.of("ROLE_CARRIER"));
     }
 
     @Test
     void offerShipment_ShouldCreateOfferAndSave() {
-        ShipmentOfferRequest request = new ShipmentOfferRequest();
-        request.setShipmentId(1L);
-        request.setCarrierCompanyId(10L);
-        request.setPrice(new BigDecimal("150.00"));
-
         when(shipmentRepository.findById(1L)).thenReturn(Optional.of(sampleShipment));
-        when(carrierCompanyRepository.findById(10L)).thenReturn(Optional.of(sampleCarrier));
+        when(carrierCompanyRepository.findByManagerEmail(sampleUser.getUsername()))
+                .thenReturn(Optional.of(sampleCarrier));
 
-        shipmentAssignmentService.offerShipment(request);
+        shipmentAssignmentService.offerShipment(1L, sampleUser, new BigDecimal("150.00"));
 
         assertEquals(ShipmentStatus.ACCEPTED, sampleShipment.getStatus());
         assertEquals(1, sampleShipment.getShipmentOffers().size());
@@ -85,15 +82,12 @@ public class ShipmentAssignmentServiceTest {
 
     @Test
     void offerShipment_ShouldThrowException_WhenShipmentNotFound() {
-        ShipmentOfferRequest request = new ShipmentOfferRequest();
-        request.setShipmentId(1L);
-
         when(shipmentRepository.findById(1L)).thenReturn(Optional.empty());
 
         ResponseStatusException exception = assertThrows(ResponseStatusException.class,
-                () -> shipmentAssignmentService.offerShipment(request));
+                () -> shipmentAssignmentService.offerShipment(1L, sampleUser, BigDecimal.TEN));
         assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
-        verify(carrierCompanyRepository, never()).findById(anyLong());
+        verify(carrierCompanyRepository, never()).findByManagerEmail(anyString());
     }
 
     @Test
@@ -102,48 +96,38 @@ public class ShipmentAssignmentServiceTest {
         sampleCarrier.getOfferedShipments().add(sampleOffer);
         sampleShipment.setStatus(ShipmentStatus.ACCEPTED);
 
-        CancelShipmentOfferRequest request = new CancelShipmentOfferRequest();
-        request.setShipmentOfferId(100L);
-        request.setCarrierId(10L);
-
         when(shipmentOfferRepository.findById(100L)).thenReturn(Optional.of(sampleOffer));
-        when(carrierCompanyRepository.findById(10L)).thenReturn(Optional.of(sampleCarrier));
+        when(carrierCompanyRepository.findByManagerEmail(sampleUser.getUsername()))
+                .thenReturn(Optional.of(sampleCarrier));
 
-        shipmentAssignmentService.cancelShipmentOffer(request);
+        shipmentAssignmentService.cancelShipmentOffer(100L, sampleUser);
 
         assertTrue(sampleShipment.getShipmentOffers().isEmpty());
         assertTrue(sampleCarrier.getOfferedShipments().isEmpty());
-        assertEquals(ShipmentStatus.PENDING, sampleShipment.getStatus()); // Should revert to PENDING
+        assertEquals(ShipmentStatus.PENDING, sampleShipment.getStatus());
         verify(shipmentRepository).save(sampleShipment);
     }
 
     @Test
     void cancelShipmentOffer_ShouldThrowException_WhenCarrierDoesNotMatch() {
         CarrierCompany differentCarrier = new CarrierCompany();
-        differentCarrier.setId(99L); // Malicious attempt scenario
-
-        CancelShipmentOfferRequest request = new CancelShipmentOfferRequest();
-        request.setShipmentOfferId(100L);
-        request.setCarrierId(99L);
+        differentCarrier.setId(99L);
 
         when(shipmentOfferRepository.findById(100L)).thenReturn(Optional.of(sampleOffer));
-        when(carrierCompanyRepository.findById(99L)).thenReturn(Optional.of(differentCarrier));
+        when(carrierCompanyRepository.findByManagerEmail(sampleUser.getUsername()))
+                .thenReturn(Optional.of(differentCarrier));
 
         ResponseStatusException exception = assertThrows(ResponseStatusException.class,
-                () -> shipmentAssignmentService.cancelShipmentOffer(request));
+                () -> shipmentAssignmentService.cancelShipmentOffer(100L, sampleUser));
         assertEquals(HttpStatus.FORBIDDEN, exception.getStatusCode());
     }
 
     @Test
     void assignCarrier_ShouldSetCarrierAndChangeStatus() {
-        AssignCarrierRequest request = new AssignCarrierRequest();
-        request.setShipmentId(1L);
-        request.setCarrierId(10L);
-
         when(shipmentRepository.findById(1L)).thenReturn(Optional.of(sampleShipment));
         when(carrierCompanyRepository.findById(10L)).thenReturn(Optional.of(sampleCarrier));
 
-        shipmentAssignmentService.assignCarrier(request);
+        shipmentAssignmentService.assignCarrier(1L, 10L);
 
         assertEquals(sampleCarrier, sampleShipment.getAssignedCarrier());
         assertEquals(ShipmentStatus.ASSIGNED, sampleShipment.getStatus());

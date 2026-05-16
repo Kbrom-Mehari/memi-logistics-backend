@@ -6,6 +6,7 @@ import com.memilogistics.shipmentservice.dto.PaymentRequest;
 import com.memilogistics.shipmentservice.service.PaymentRecordService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -15,8 +16,9 @@ public class PaymentAndCompletionController {
     private final PaymentRecordService paymentRecordService;
 
     @PostMapping("/{shipmentId}/initiate-payment")
+    @PreAuthorize("hasRole('SHIPPER')")
     public ResponseEntity<Void> initiatePayment(
-            @PathVariable Long shipmentId,
+            @PathVariable("shipmentId") Long shipmentId,
             @RequestBody PaymentRequest request
     ){
         paymentRecordService.initiatePayment(shipmentId, request);
@@ -24,8 +26,9 @@ public class PaymentAndCompletionController {
     }
 
     @PostMapping("/{shipmentId}/confirm-payment")
+    @PreAuthorize("hasRole('CARRIER')")
     public ResponseEntity<Void> confirmPayment(
-            @PathVariable Long shipmentId,
+            @PathVariable("shipmentId") Long shipmentId,
             @CurrentUser CustomUserPrincipal principal
     ){
         paymentRecordService.confirmPayment(shipmentId, principal);

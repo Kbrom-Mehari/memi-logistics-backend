@@ -1,5 +1,7 @@
 package com.memilogistics.shipmentservice.service;
 
+import com.memilogistics.commonsecurity.annotation.CurrentUser;
+import com.memilogistics.commonsecurity.principal.CustomUserPrincipal;
 import com.memilogistics.shipmentservice.dto.StatusUpdateRequest;
 import com.memilogistics.shipmentservice.entity.CarrierCompany;
 import com.memilogistics.shipmentservice.entity.DeliveryConfirmation;
@@ -24,7 +26,7 @@ public class ShipmentStatusService {
     private final CarrierCompanyRepository carrierCompanyRepository;
 
     @Transactional
-    public Shipment updateShipmentStatus(Long shipmentId, StatusUpdateRequest request) {
+    public Shipment updateShipmentStatus(Long shipmentId, StatusUpdateRequest request, @CurrentUser CustomUserPrincipal user) {
         if (request.getStatus() == null) {
             throw new IllegalArgumentException("Shipment status is required");
         }
@@ -33,8 +35,8 @@ public class ShipmentStatusService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "COMPLETED status cannot be manually set");
         }
 
-        CarrierCompany carrierCompany = carrierCompanyRepository.findById(request.getCarrierId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Carrier company not found with id: " + request.getCarrierId()));
+        CarrierCompany carrierCompany = carrierCompanyRepository.findByManagerEmail(user.getUsername())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Carrier company not found"));
 
         Shipment shipment = shipmentRepository.findById(shipmentId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Shipment not found with id: " + shipmentId));

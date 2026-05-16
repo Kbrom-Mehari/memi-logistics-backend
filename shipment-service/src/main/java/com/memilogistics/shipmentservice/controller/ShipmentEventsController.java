@@ -19,8 +19,8 @@ import java.util.List;
 public class ShipmentEventsController {
     private final ShipmentEventsService shipmentEventsService;
 
-    @GetMapping("/{id}/events")
-    public ResponseEntity<List<ShipmentEvent>> getShipmentEvents(@PathVariable Long id) {
+    @GetMapping("/{shipmentId}/events")
+    public ResponseEntity<List<ShipmentEvent>> getShipmentEvents(@PathVariable("shipmentId") Long id) {
         try {
             var events = shipmentEventsService.getShipmentEvents(id);
             return ResponseEntity.ok(events);

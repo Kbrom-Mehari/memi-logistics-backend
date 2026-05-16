@@ -43,16 +43,16 @@ public class ShipmentController {
         }
     }
 
-    @GetMapping("/{id}")
-    public ShipmentResponse getShipment(@PathVariable Long id) {
+    @GetMapping("/{shipmentId}")
+    public ShipmentResponse getShipment(@PathVariable("shipmentId") Long id) {
         try {
             return shipmentMapper.toResponse(shipmentService.getShipment(id));
         } catch (IllegalArgumentException ex) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, ex.getMessage(), ex);
         }
     }
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteShipment(@PathVariable Long id){
+    @DeleteMapping("/{shipmentId}")
+    public ResponseEntity<Void> deleteShipment(@PathVariable("shipmentId") Long id){
         shipmentService.deleteShipment(id);
         return ResponseEntity.noContent().build();
 
@@ -84,7 +84,7 @@ public class ShipmentController {
     }
 
     @GetMapping("/list-by-destination/{destination}")
-    public ResponseEntity<List<ShipmentResponse>> listShipmentsByDestination(@PathVariable String destination,
+    public ResponseEntity<List<ShipmentResponse>> listShipmentsByDestination(@PathVariable("destination") String destination,
                                                                      @RequestParam(name = "page", defaultValue = "0") int page,
                                                                      @RequestParam(name = "size", defaultValue = "20") int size) {
         var shipments = shipmentService.listShipmentsByDestination(destination, page, size);
@@ -92,7 +92,7 @@ public class ShipmentController {
     }
 
     @GetMapping("/list-by-origin/{origin}")
-    public ResponseEntity<List<ShipmentResponse>> listShipmentsByOrigin(@PathVariable String origin,
+    public ResponseEntity<List<ShipmentResponse>> listShipmentsByOrigin(@PathVariable("origin") String origin,
                                                                 @RequestParam(name = "page", defaultValue = "0") int page,
                                                                 @RequestParam(name = "size", defaultValue = "20") int size) {
         var shipments = shipmentService.listShipmentsByOrigin(origin, page, size);

@@ -1,5 +1,6 @@
 package com.memilogistics.shipmentservice.service;
 
+import com.memilogistics.commonsecurity.principal.CustomUserPrincipal;
 import com.memilogistics.shipmentservice.dto.StatusUpdateRequest;
 import com.memilogistics.shipmentservice.entity.CarrierCompany;
 import com.memilogistics.shipmentservice.entity.Shipment;
@@ -16,6 +17,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -37,6 +39,7 @@ public class ShipmentStatusServiceTest {
     private Shipment sampleShipment;
     private CarrierCompany sampleCarrier;
     private StatusUpdateRequest updateRequest;
+    private CustomUserPrincipal sampleUser;
 
     @BeforeEach
     void setUp() {
@@ -50,18 +53,20 @@ public class ShipmentStatusServiceTest {
         sampleShipment.setAssignedCarrier(sampleCarrier);
 
         updateRequest = new StatusUpdateRequest();
-        updateRequest.setCarrierId(10L);
         updateRequest.setStatus(ShipmentStatus.PICKED_UP);
         updateRequest.setLocation("Warehouse A");
+
+        sampleUser = new CustomUserPrincipal("manager@express.com", List.of("ROLE_CARRIER"));
     }
 
     @Test
     void updateShipmentStatus_ShouldUpdateStatus_WhenValid() {
-        when(carrierCompanyRepository.findById(10L)).thenReturn(Optional.of(sampleCarrier));
+        when(carrierCompanyRepository.findByManagerEmail(sampleUser.getUsername()))
+                .thenReturn(Optional.of(sampleCarrier));
         when(shipmentRepository.findById(1L)).thenReturn(Optional.of(sampleShipment));
         when(shipmentRepository.save(any(Shipment.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        Shipment updatedShipment = shipmentStatusService.updateShipmentStatus(1L, updateRequest);
+        Shipment updatedShipment = shipmentStatusService.updateShipmentStatus(1L, updateRequest, sampleUser);
 
         assertNotNull(updatedShipment);
         assertEquals(ShipmentStatus.PICKED_UP, updatedShipment.getStatus());
@@ -74,7 +79,7 @@ public class ShipmentStatusServiceTest {
         updateRequest.setStatus(null);
 
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-                () -> shipmentStatusService.updateShipmentStatus(1L, updateRequest));
+                () -> shipmentStatusService.updateShipmentStatus(1L, updateRequest, sampleUser));
         assertEquals("Shipment status is required", exception.getMessage());
     }
 
@@ -83,28 +88,30 @@ public class ShipmentStatusServiceTest {
         updateRequest.setStatus(ShipmentStatus.COMPLETED);
 
         ResponseStatusException exception = assertThrows(ResponseStatusException.class,
-                () -> shipmentStatusService.updateShipmentStatus(1L, updateRequest));
+                () -> shipmentStatusService.updateShipmentStatus(1L, updateRequest, sampleUser));
         assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusCode());
         assertTrue(exception.getReason().contains("COMPLETED status cannot be manually set"));
     }
 
     @Test
     void updateShipmentStatus_ShouldThrowException_WhenCarrierNotFound() {
-        when(carrierCompanyRepository.findById(10L)).thenReturn(Optional.empty());
+        when(carrierCompanyRepository.findByManagerEmail(sampleUser.getUsername()))
+                .thenReturn(Optional.empty());
 
         ResponseStatusException exception = assertThrows(ResponseStatusException.class,
-                () -> shipmentStatusService.updateShipmentStatus(1L, updateRequest));
+                () -> shipmentStatusService.updateShipmentStatus(1L, updateRequest, sampleUser));
         assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
         assertTrue(exception.getReason().contains("Carrier company not found"));
     }
 
     @Test
     void updateShipmentStatus_ShouldThrowException_WhenShipmentNotFound() {
-        when(carrierCompanyRepository.findById(10L)).thenReturn(Optional.of(sampleCarrier));
+        when(carrierCompanyRepository.findByManagerEmail(sampleUser.getUsername()))
+                .thenReturn(Optional.of(sampleCarrier));
         when(shipmentRepository.findById(1L)).thenReturn(Optional.empty());
 
         ResponseStatusException exception = assertThrows(ResponseStatusException.class,
-                () -> shipmentStatusService.updateShipmentStatus(1L, updateRequest));
+                () -> shipmentStatusService.updateShipmentStatus(1L, updateRequest, sampleUser));
         assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
         assertTrue(exception.getReason().contains("Shipment not found"));
     }
@@ -113,11 +120,12 @@ public class ShipmentStatusServiceTest {
     void updateShipmentStatus_ShouldThrowException_WhenShipmentHasNoCarrier() {
         sampleShipment.setAssignedCarrier(null);
 
-        when(carrierCompanyRepository.findById(10L)).thenReturn(Optional.of(sampleCarrier));
+        when(carrierCompanyRepository.findByManagerEmail(sampleUser.getUsername()))
+                .thenReturn(Optional.of(sampleCarrier));
         when(shipmentRepository.findById(1L)).thenReturn(Optional.of(sampleShipment));
 
         ResponseStatusException exception = assertThrows(ResponseStatusException.class,
-                () -> shipmentStatusService.updateShipmentStatus(1L, updateRequest));
+                () -> shipmentStatusService.updateShipmentStatus(1L, updateRequest, sampleUser));
         assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusCode());
         assertTrue(exception.getReason().contains("Shipment has no assigned carrier"));
     }
@@ -128,25 +136,26 @@ public class ShipmentStatusServiceTest {
         wrongCarrier.setId(99L);
         sampleShipment.setAssignedCarrier(wrongCarrier);
 
-        when(carrierCompanyRepository.findById(10L)).thenReturn(Optional.of(sampleCarrier));
+        when(carrierCompanyRepository.findByManagerEmail(sampleUser.getUsername()))
+                .thenReturn(Optional.of(sampleCarrier));
         when(shipmentRepository.findById(1L)).thenReturn(Optional.of(sampleShipment));
 
         ResponseStatusException exception = assertThrows(ResponseStatusException.class,
-                () -> shipmentStatusService.updateShipmentStatus(1L, updateRequest));
+                () -> shipmentStatusService.updateShipmentStatus(1L, updateRequest, sampleUser));
         assertEquals(HttpStatus.FORBIDDEN, exception.getStatusCode());
         assertTrue(exception.getReason().contains("not assigned to this shipment"));
     }
 
     @Test
     void updateShipmentStatus_ShouldThrowException_WhenInvalidTransition() {
-        // ASSIGNED cannot transition directly to IN_TRANSIT, for example
         updateRequest.setStatus(ShipmentStatus.IN_TRANSIT);
 
-        when(carrierCompanyRepository.findById(10L)).thenReturn(Optional.of(sampleCarrier));
+        when(carrierCompanyRepository.findByManagerEmail(sampleUser.getUsername()))
+                .thenReturn(Optional.of(sampleCarrier));
         when(shipmentRepository.findById(1L)).thenReturn(Optional.of(sampleShipment));
 
         assertThrows(InvalidShipmentStatusTransitionException.class,
-                () -> shipmentStatusService.updateShipmentStatus(1L, updateRequest));
+                () -> shipmentStatusService.updateShipmentStatus(1L, updateRequest, sampleUser));
     }
 
     @Test
@@ -154,11 +163,12 @@ public class ShipmentStatusServiceTest {
         sampleShipment.setStatus(ShipmentStatus.ARRIVED_AT_DESTINATION);
         updateRequest.setStatus(ShipmentStatus.DELIVERED);
 
-        when(carrierCompanyRepository.findById(10L)).thenReturn(Optional.of(sampleCarrier));
+        when(carrierCompanyRepository.findByManagerEmail(sampleUser.getUsername()))
+                .thenReturn(Optional.of(sampleCarrier));
         when(shipmentRepository.findById(1L)).thenReturn(Optional.of(sampleShipment));
         when(shipmentRepository.save(any(Shipment.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        Shipment updatedShipment = shipmentStatusService.updateShipmentStatus(1L, updateRequest);
+        Shipment updatedShipment = shipmentStatusService.updateShipmentStatus(1L, updateRequest, sampleUser);
 
         assertEquals(ShipmentStatus.DELIVERED, updatedShipment.getStatus());
         assertNotNull(updatedShipment.getDeliveryConfirmation());
