@@ -135,8 +135,8 @@ public class ShipmentService {
         return new DashboardInformation(
                 shipmentRepository.countByStatus(ShipmentStatus.PENDING),
                 shipmentRepository.countByStatus(ShipmentStatus.DELIVERED),
-                shipmentRepository.CountByFragile(true),
-                shipmentRepository.CountByFragile(false)
+                shipmentRepository.countByFragile(true),
+                shipmentRepository.countByFragile(false)
                 );
     }
 
