@@ -28,10 +28,10 @@ public class PasswordResetService {
     private final PasswordEncoder passwordEncoder;
     private final EmailService emailService;
 
-    @Value("${application.security.password-reset-expiration:3600000}")
+    @Value("${application.security.password-reset-expiration}")
     private long resetTokenExpirationMs;
 
-    @Value("${application.security.password-reset-url:https://localhost:3000/reset-password}")
+    @Value("${application.security.password-reset-url}")
     private String resetBaseUrl;
 
     @Transactional
