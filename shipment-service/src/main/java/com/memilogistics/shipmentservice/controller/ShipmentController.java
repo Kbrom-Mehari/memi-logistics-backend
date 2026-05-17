@@ -59,7 +59,7 @@ public class ShipmentController {
     }
 
     @GetMapping("/tracking/{trackingNumber}")
-    public ResponseEntity<ShipmentResponse> getShipmentByTrackingNumber(@PathVariable String trackingNumber) {
+    public ResponseEntity<ShipmentResponse> getShipmentByTrackingNumber(@PathVariable("trackingNumber") String trackingNumber) {
         try {
             var shipment = shipmentService.getShipmentByTrackingNumber(trackingNumber);
             return ResponseEntity.ok(shipmentMapper.toResponse(shipment));
@@ -104,8 +104,8 @@ public class ShipmentController {
         return ResponseEntity.ok(shipmentService.getDashboardInformation());
     }
 
-    @PatchMapping("/update/{id}")
-    public ResponseEntity<ShipmentResponse> updateShipment(@PathVariable Long id, @RequestBody UpdateShipmentRequest update) {
+    @PatchMapping("/update/{shipmentId}")
+    public ResponseEntity<ShipmentResponse> updateShipment(@PathVariable("shipmentId") Long id, @RequestBody UpdateShipmentRequest update) {
         try {
             return ResponseEntity.ok(shipmentMapper.toResponse(shipmentService.updateShipment(id, update)));
         } catch (IllegalArgumentException ex) {

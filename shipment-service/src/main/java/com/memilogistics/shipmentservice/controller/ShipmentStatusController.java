@@ -8,6 +8,7 @@ import com.memilogistics.shipmentservice.service.ShipmentStatusService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -19,6 +20,7 @@ public class ShipmentStatusController {
 
 
     @PatchMapping("/{shipmentId}/update-status")
+    @PreAuthorize("hasRole('CARRIER') or hasRole('ADMIN')")
     public ResponseEntity<Shipment> updateShipmentStatus(@PathVariable("shipmentId") Long id,
                                                          @RequestBody StatusUpdateRequest request,
                                                          @CurrentUser CustomUserPrincipal user

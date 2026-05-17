@@ -1,7 +1,8 @@
 package com.memilogistics.shipmentservice.service;
 
+import com.memilogistics.shipmentservice.dto.ShipmentEventResponse;
 import com.memilogistics.shipmentservice.entity.Shipment;
-import com.memilogistics.shipmentservice.entity.ShipmentEvent;
+import com.memilogistics.shipmentservice.mapper.ShipmentEventMapper;
 import com.memilogistics.shipmentservice.repository.ShipmentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -12,10 +13,11 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ShipmentEventsService {
     private final ShipmentRepository shipmentRepository;
+    private final ShipmentEventMapper shipmentEventMapper;
 
-    public List<ShipmentEvent> getShipmentEvents(Long shipmentId) {
+    public List<ShipmentEventResponse> getShipmentEvents(Long shipmentId) {
         Shipment shipment = shipmentRepository.findById(shipmentId)
                 .orElseThrow(() -> new IllegalArgumentException("Shipment not found with id: " + shipmentId));
-        return shipment.getShipmentEvents();
+        return shipmentEventMapper.toResponseList(shipment.getShipmentEvents());
     }
 }

@@ -1,6 +1,6 @@
 package com.memilogistics.shipmentservice.controller;
 
-import com.memilogistics.shipmentservice.entity.ShipmentEvent;
+import com.memilogistics.shipmentservice.dto.ShipmentEventResponse;
 import com.memilogistics.shipmentservice.service.ShipmentEventsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -20,7 +20,7 @@ public class ShipmentEventsController {
     private final ShipmentEventsService shipmentEventsService;
 
     @GetMapping("/{shipmentId}/events")
-    public ResponseEntity<List<ShipmentEvent>> getShipmentEvents(@PathVariable("shipmentId") Long id) {
+    public ResponseEntity<List<ShipmentEventResponse>> getShipmentEvents(@PathVariable("shipmentId") Long id) {
         try {
             var events = shipmentEventsService.getShipmentEvents(id);
             return ResponseEntity.ok(events);
