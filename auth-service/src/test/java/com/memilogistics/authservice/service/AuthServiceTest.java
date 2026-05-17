@@ -154,7 +154,9 @@ public class AuthServiceTest {
         Authentication authentication = mock(Authentication.class);
         when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
                 .thenReturn(authentication);
-        when(jwtService.generateToken(userDetails)).thenThrow(new RuntimeException("Jwt generation failed"));
+        when(authentication.getPrincipal()).thenReturn(userDetails);
+        when(jwtService.generateToken(any(UserDetails.class)))
+                .thenThrow(new RuntimeException("Jwt generation failed"));
         assertThrows(RuntimeException.class, () -> authService.login(request));
     }
 }

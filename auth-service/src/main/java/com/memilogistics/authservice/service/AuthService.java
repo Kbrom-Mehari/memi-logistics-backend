@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.Objects;
 import java.util.UUID;
 
 @Service
@@ -62,10 +63,12 @@ public class AuthService {
         );
         UserDetails userDetails =(UserDetails) authentication.getPrincipal();
 
-        String accessToken = jwtService.generateToken(userDetails);
+        String accessToken = jwtService.generateToken(
+                Objects.requireNonNull(userDetails, "User details cannot be null")
+        );
         String refreshToken = createRefreshToken((User) userDetails);
 
-        return new AuthResponse(accessToken, refreshToken);
+        return new AuthResponse(accessToken, refreshToken, ((User) userDetails).getRole().toString());
     }
     public void logout(LogoutRequest logoutRequest){
         String hashed =refreshTokenUtil.hash(logoutRequest.getRefreshToken());
@@ -94,7 +97,7 @@ public class AuthService {
         String newAccessToken = jwtService.generateToken(user);
         String newRefreshToken = createRefreshToken(user);
 
-        return new AuthResponse(newAccessToken, newRefreshToken);
+        return new AuthResponse(newAccessToken, newRefreshToken, user.getRole().toString());
     }
 
     private String createRefreshToken(User user){

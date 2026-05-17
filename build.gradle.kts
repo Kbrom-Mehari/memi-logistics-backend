@@ -33,4 +33,5 @@ dependencies {
     implementation(project(":auth-service"))
     implementation(project(":common-security"))
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.2")
+    implementation("org.springframework.boot:spring-boot-starter-mail")
 }

@@ -24,6 +24,7 @@ dependencies {
     runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.13.0")
 
     implementation("org.springframework.boot:spring-boot-starter-validation")
+    implementation("org.springframework.boot:spring-boot-starter-mail")
     testImplementation("org.springframework.security:spring-security-test")
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")

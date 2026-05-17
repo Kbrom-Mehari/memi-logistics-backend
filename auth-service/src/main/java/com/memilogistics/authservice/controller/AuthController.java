@@ -3,6 +3,7 @@ package com.memilogistics.authservice.controller;
 import com.memilogistics.authservice.dto.*;
 import com.memilogistics.authservice.enums.Role;
 import com.memilogistics.authservice.service.AuthService;
+import com.memilogistics.authservice.service.PasswordResetService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class AuthController {
     private final AuthService authService;
+    private final PasswordResetService passwordResetService;
 
     @PostMapping("/auth/login")
     public ResponseEntity<AuthResponse> login(@RequestBody @Valid LoginRequest loginRequest){
@@ -47,6 +49,18 @@ public class AuthController {
     @PostMapping("/auth/logout")
     public ResponseEntity<Void> logout(@RequestBody LogoutRequest logoutRequest) {
         authService.logout(logoutRequest);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/auth/forgot-password")
+    public ResponseEntity<Void> forgotPassword(@RequestBody @Valid ForgotPasswordRequest request) {
+        passwordResetService.requestReset(request);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/auth/reset-password")
+    public ResponseEntity<Void> resetPassword(@RequestBody @Valid ResetPasswordRequest request) {
+        passwordResetService.resetPassword(request);
         return ResponseEntity.ok().build();
     }
 
