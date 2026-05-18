@@ -8,7 +8,6 @@ import com.memilogistics.authservice.repository.PasswordResetTokenRepository;
 import com.memilogistics.authservice.repository.RefreshTokenRepository;
 import com.memilogistics.authservice.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -81,3 +80,5 @@ public class PasswordResetService {
         return base + "?token=" + token;
     }
 }
+
+//http://localhost:3000/reset-password?token=abc123def456ghi789jkl012mno345pq678rst901uvwx234yz567890ab12

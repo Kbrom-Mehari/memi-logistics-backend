@@ -2,11 +2,13 @@ package com.memilogistics.shipmentservice.mapper;
 
 import com.memilogistics.shipmentservice.dto.AddressResponse;
 import com.memilogistics.shipmentservice.dto.CarrierCompanyResponse;
+import com.memilogistics.shipmentservice.dto.ShipmentOfferResponse;
 import com.memilogistics.shipmentservice.dto.ShipmentResponse;
 import com.memilogistics.shipmentservice.dto.ShipperProfileResponse;
 import com.memilogistics.shipmentservice.entity.Address;
 import com.memilogistics.shipmentservice.entity.CarrierCompany;
 import com.memilogistics.shipmentservice.entity.Shipment;
+import com.memilogistics.shipmentservice.entity.ShipmentOffer;
 import com.memilogistics.shipmentservice.entity.ShipperProfile;
 import org.springframework.stereotype.Component;
 
@@ -54,6 +56,35 @@ public class ShipmentMapper {
             return null;
         }
         return shipments.stream().map(this::toResponse).collect(Collectors.toList());
+    }
+
+    public ShipmentOfferResponse toOfferResponse(ShipmentOffer offer) {
+        if (offer == null) {
+            return null;
+        }
+
+        ShipmentOfferResponse response = new ShipmentOfferResponse();
+        response.setId(offer.getId());
+        response.setCreatedAt(offer.getCreatedAt());
+        response.setPrice(offer.getPrice());
+
+        if (offer.getShipment() != null) {
+            response.setShipmentId(offer.getShipment().getId());
+            response.setShipmentTrackingNumber(offer.getShipment().getTrackingNumber());
+        }
+
+        if (offer.getCarrierCompany() != null) {
+            response.setCarrierCompany(toCarrierCompanyResponse(offer.getCarrierCompany()));
+        }
+
+        return response;
+    }
+
+    public List<ShipmentOfferResponse> toOfferResponseList(List<ShipmentOffer> offers) {
+        if (offers == null) {
+            return null;
+        }
+        return offers.stream().map(this::toOfferResponse).collect(Collectors.toList());
     }
 
     private ShipperProfileResponse toShipperProfileResponse(ShipperProfile shipper) {

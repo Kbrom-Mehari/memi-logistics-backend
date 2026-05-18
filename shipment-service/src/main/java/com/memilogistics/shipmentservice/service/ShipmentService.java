@@ -5,6 +5,7 @@ import com.memilogistics.shipmentservice.dto.DashboardInformation;
 import com.memilogistics.shipmentservice.dto.UpdateShipmentRequest;
 import com.memilogistics.shipmentservice.entity.Shipment;
 import com.memilogistics.shipmentservice.entity.ShipmentEvent;
+import com.memilogistics.shipmentservice.entity.ShipmentOffer;
 import com.memilogistics.shipmentservice.enums.ShipmentStatus;
 import com.memilogistics.shipmentservice.repository.ShipmentRepository;
 import lombok.RequiredArgsConstructor;
@@ -54,6 +55,10 @@ public class ShipmentService {
                 .orElseThrow(() -> new IllegalArgumentException("Shipment not found with id: " + id));
     }
 
+    public List<ShipmentOffer> getShipmentOffers(Long id) {
+        Shipment shipment = getShipment(id);
+        return shipment.getShipmentOffers();
+    }
 
     public Shipment getShipmentByTrackingNumber(String trackingNumber) {
         if (trackingNumber == null || trackingNumber.isBlank()) {

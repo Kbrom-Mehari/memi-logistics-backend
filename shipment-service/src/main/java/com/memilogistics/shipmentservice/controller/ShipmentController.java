@@ -68,6 +68,18 @@ public class ShipmentController {
         }
     }
 
+
+    @GetMapping("/{shipmentId}/offers")
+    public ResponseEntity<List<ShipmentOfferResponse>> getShipmentOffers(@PathVariable("shipmentId") Long id) {
+        try {
+            var offers = shipmentService.getShipmentOffers(id);
+            return ResponseEntity.ok(shipmentMapper.toOfferResponseList(offers));
+        } catch (IllegalArgumentException ex) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, ex.getMessage(), ex);
+        }
+    }
+
+
     @GetMapping("/list")
     public ResponseEntity<List<ShipmentResponse>> listShipments(@RequestParam(name = "page", defaultValue = "0") int page,
                                         @RequestParam(name = "size", defaultValue = "20") int size) {
