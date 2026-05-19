@@ -36,7 +36,7 @@ public class ShipmentAssignmentService {
                         HttpStatus.NOT_FOUND, "shipment with id " + shipmentId + " not found"
                 ));
 
-        CarrierCompany carrierCompany = carrierCompanyRepository.findByManagerEmail(user.getUsername())
+        CarrierCompany carrierCompany = carrierCompanyRepository.findByAuthenticationEmail(user.getUsername())
                 .orElseThrow(()-> new ResponseStatusException(
                         HttpStatus.NOT_FOUND, "carrier company not found"
                 ));
@@ -62,7 +62,7 @@ public class ShipmentAssignmentService {
                         )
                 );
 
-        CarrierCompany carrierCompany = carrierCompanyRepository.findByManagerEmail(user.getUsername())
+        CarrierCompany carrierCompany = carrierCompanyRepository.findByAuthenticationEmail(user.getUsername())
                 .orElseThrow(
                         ()-> new ResponseStatusException(
                                 HttpStatus.NOT_FOUND, "carrier company not found"

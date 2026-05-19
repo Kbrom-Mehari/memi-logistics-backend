@@ -118,7 +118,7 @@ public class PaymentRecordServiceTest {
     @Test
     void confirmPayment_ShouldSucceed_WhenValid() {
         sampleShipment.setPaymentRecord(samplePaymentRecord);
-        when(carrierCompanyRepository.findByManagerEmail("carrier@test.com")).thenReturn(Optional.of(sampleCarrier));
+        when(carrierCompanyRepository.findByAuthenticationEmail("carrier@test.com")).thenReturn(Optional.of(sampleCarrier));
         when(shipmentRepository.findById(1L)).thenReturn(Optional.of(sampleShipment));
 
         paymentRecordService.confirmPayment(1L, mockPrincipal);
@@ -132,7 +132,7 @@ public class PaymentRecordServiceTest {
 
     @Test
     void confirmPayment_ShouldThrowException_WhenShipmentNotFound() {
-        when(carrierCompanyRepository.findByManagerEmail("carrier@test.com")).thenReturn(Optional.of(sampleCarrier));
+        when(carrierCompanyRepository.findByAuthenticationEmail("carrier@test.com")).thenReturn(Optional.of(sampleCarrier));
         when(shipmentRepository.findById(1L)).thenReturn(Optional.empty());
 
         ResponseStatusException exception = assertThrows(ResponseStatusException.class,
@@ -143,7 +143,7 @@ public class PaymentRecordServiceTest {
     @Test
     void confirmPayment_ShouldThrowException_WhenNoAssignedCarrier() {
         sampleShipment.setAssignedCarrier(null);
-        when(carrierCompanyRepository.findByManagerEmail("carrier@test.com")).thenReturn(Optional.of(sampleCarrier));
+        when(carrierCompanyRepository.findByAuthenticationEmail("carrier@test.com")).thenReturn(Optional.of(sampleCarrier));
         when(shipmentRepository.findById(1L)).thenReturn(Optional.of(sampleShipment));
 
         ResponseStatusException exception = assertThrows(ResponseStatusException.class,
@@ -157,7 +157,7 @@ public class PaymentRecordServiceTest {
         CarrierCompany wrongCarrier = new CarrierCompany();
         wrongCarrier.setId(99L);
         sampleShipment.setAssignedCarrier(wrongCarrier);
-        when(carrierCompanyRepository.findByManagerEmail("carrier@test.com")).thenReturn(Optional.of(sampleCarrier));
+        when(carrierCompanyRepository.findByAuthenticationEmail("carrier@test.com")).thenReturn(Optional.of(sampleCarrier));
         when(shipmentRepository.findById(1L)).thenReturn(Optional.of(sampleShipment));
 
         ResponseStatusException exception = assertThrows(ResponseStatusException.class,
@@ -169,7 +169,7 @@ public class PaymentRecordServiceTest {
     @Test
     void confirmPayment_ShouldThrowException_WhenPaymentNotInitiated() {
         sampleShipment.setPaymentRecord(null); // No payment record
-        when(carrierCompanyRepository.findByManagerEmail("carrier@test.com")).thenReturn(Optional.of(sampleCarrier));
+        when(carrierCompanyRepository.findByAuthenticationEmail("carrier@test.com")).thenReturn(Optional.of(sampleCarrier));
         when(shipmentRepository.findById(1L)).thenReturn(Optional.of(sampleShipment));
 
         ResponseStatusException exception = assertThrows(ResponseStatusException.class,
@@ -182,7 +182,7 @@ public class PaymentRecordServiceTest {
     void confirmPayment_ShouldThrowException_WhenNotShipperConfirmed() {
         samplePaymentRecord.setShipperConfirmed(false);
         sampleShipment.setPaymentRecord(samplePaymentRecord);
-        when(carrierCompanyRepository.findByManagerEmail("carrier@test.com")).thenReturn(Optional.of(sampleCarrier));
+        when(carrierCompanyRepository.findByAuthenticationEmail("carrier@test.com")).thenReturn(Optional.of(sampleCarrier));
         when(shipmentRepository.findById(1L)).thenReturn(Optional.of(sampleShipment));
 
         ResponseStatusException exception = assertThrows(ResponseStatusException.class,
@@ -195,7 +195,7 @@ public class PaymentRecordServiceTest {
     void confirmPayment_ShouldThrowException_WhenAlreadyCarrierConfirmed() {
         samplePaymentRecord.setCarrierConfirmed(true);
         sampleShipment.setPaymentRecord(samplePaymentRecord);
-        when(carrierCompanyRepository.findByManagerEmail("carrier@test.com")).thenReturn(Optional.of(sampleCarrier));
+        when(carrierCompanyRepository.findByAuthenticationEmail("carrier@test.com")).thenReturn(Optional.of(sampleCarrier));
         when(shipmentRepository.findById(1L)).thenReturn(Optional.of(sampleShipment));
 
         ResponseStatusException exception = assertThrows(ResponseStatusException.class,

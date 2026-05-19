@@ -18,7 +18,8 @@ public class ShipperProfile {
     private Long id;
 
     @Email
-    private String email; //should be auth email
+    @Column(unique = true, nullable = false)
+    private String authenticationEmail; //should be auth email
 
     @NotBlank
     private String firstName;
@@ -28,7 +29,7 @@ public class ShipperProfile {
     private String companyName;
     @NotBlank
     private String businessName;
-    @OneToOne
+    @OneToOne(orphanRemoval = true, fetch = FetchType.LAZY)
     private Address address;
 
     @OneToMany(

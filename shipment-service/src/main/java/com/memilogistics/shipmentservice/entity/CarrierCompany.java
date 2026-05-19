@@ -20,10 +20,12 @@ public class CarrierCompany {
 
     private String companyName;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY, orphanRemoval = true)
     private Address address;
 
-    private String managerEmail;
+    @Email
+    @Column(unique = true, nullable = false)
+    private String authenticationEmail;
 
     @Email
     private String companyEmail;

@@ -61,7 +61,7 @@ public class ShipmentStatusServiceTest {
 
     @Test
     void updateShipmentStatus_ShouldUpdateStatus_WhenValid() {
-        when(carrierCompanyRepository.findByManagerEmail(sampleUser.getUsername()))
+        when(carrierCompanyRepository.findByAuthenticationEmail(sampleUser.getUsername()))
                 .thenReturn(Optional.of(sampleCarrier));
         when(shipmentRepository.findById(1L)).thenReturn(Optional.of(sampleShipment));
         when(shipmentRepository.save(any(Shipment.class))).thenAnswer(invocation -> invocation.getArgument(0));
@@ -95,7 +95,7 @@ public class ShipmentStatusServiceTest {
 
     @Test
     void updateShipmentStatus_ShouldThrowException_WhenCarrierNotFound() {
-        when(carrierCompanyRepository.findByManagerEmail(sampleUser.getUsername()))
+        when(carrierCompanyRepository.findByAuthenticationEmail(sampleUser.getUsername()))
                 .thenReturn(Optional.empty());
 
         ResponseStatusException exception = assertThrows(ResponseStatusException.class,
@@ -106,7 +106,7 @@ public class ShipmentStatusServiceTest {
 
     @Test
     void updateShipmentStatus_ShouldThrowException_WhenShipmentNotFound() {
-        when(carrierCompanyRepository.findByManagerEmail(sampleUser.getUsername()))
+        when(carrierCompanyRepository.findByAuthenticationEmail(sampleUser.getUsername()))
                 .thenReturn(Optional.of(sampleCarrier));
         when(shipmentRepository.findById(1L)).thenReturn(Optional.empty());
 
@@ -120,7 +120,7 @@ public class ShipmentStatusServiceTest {
     void updateShipmentStatus_ShouldThrowException_WhenShipmentHasNoCarrier() {
         sampleShipment.setAssignedCarrier(null);
 
-        when(carrierCompanyRepository.findByManagerEmail(sampleUser.getUsername()))
+        when(carrierCompanyRepository.findByAuthenticationEmail(sampleUser.getUsername()))
                 .thenReturn(Optional.of(sampleCarrier));
         when(shipmentRepository.findById(1L)).thenReturn(Optional.of(sampleShipment));
 
@@ -136,7 +136,7 @@ public class ShipmentStatusServiceTest {
         wrongCarrier.setId(99L);
         sampleShipment.setAssignedCarrier(wrongCarrier);
 
-        when(carrierCompanyRepository.findByManagerEmail(sampleUser.getUsername()))
+        when(carrierCompanyRepository.findByAuthenticationEmail(sampleUser.getUsername()))
                 .thenReturn(Optional.of(sampleCarrier));
         when(shipmentRepository.findById(1L)).thenReturn(Optional.of(sampleShipment));
 
@@ -150,7 +150,7 @@ public class ShipmentStatusServiceTest {
     void updateShipmentStatus_ShouldThrowException_WhenInvalidTransition() {
         updateRequest.setStatus(ShipmentStatus.IN_TRANSIT);
 
-        when(carrierCompanyRepository.findByManagerEmail(sampleUser.getUsername()))
+        when(carrierCompanyRepository.findByAuthenticationEmail(sampleUser.getUsername()))
                 .thenReturn(Optional.of(sampleCarrier));
         when(shipmentRepository.findById(1L)).thenReturn(Optional.of(sampleShipment));
 
@@ -163,7 +163,7 @@ public class ShipmentStatusServiceTest {
         sampleShipment.setStatus(ShipmentStatus.ARRIVED_AT_DESTINATION);
         updateRequest.setStatus(ShipmentStatus.DELIVERED);
 
-        when(carrierCompanyRepository.findByManagerEmail(sampleUser.getUsername()))
+        when(carrierCompanyRepository.findByAuthenticationEmail(sampleUser.getUsername()))
                 .thenReturn(Optional.of(sampleCarrier));
         when(shipmentRepository.findById(1L)).thenReturn(Optional.of(sampleShipment));
         when(shipmentRepository.save(any(Shipment.class))).thenAnswer(invocation -> invocation.getArgument(0));

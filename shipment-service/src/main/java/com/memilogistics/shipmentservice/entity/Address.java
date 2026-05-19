@@ -20,7 +20,4 @@ public class Address {
     private String zip;
     private String country = "Ethiopia";
     private String phoneNumber;
-
-    @OneToOne(mappedBy = "address")
-    private ShipperProfile shipperProfile;
 }

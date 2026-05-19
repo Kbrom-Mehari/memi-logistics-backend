@@ -69,7 +69,7 @@ public class ShipmentAssignmentServiceTest {
     @Test
     void offerShipment_ShouldCreateOfferAndSave() {
         when(shipmentRepository.findById(1L)).thenReturn(Optional.of(sampleShipment));
-        when(carrierCompanyRepository.findByManagerEmail(sampleUser.getUsername()))
+        when(carrierCompanyRepository.findByAuthenticationEmail(sampleUser.getUsername()))
                 .thenReturn(Optional.of(sampleCarrier));
 
         shipmentAssignmentService.offerShipment(1L, sampleUser, new BigDecimal("150.00"));
@@ -87,7 +87,7 @@ public class ShipmentAssignmentServiceTest {
         ResponseStatusException exception = assertThrows(ResponseStatusException.class,
                 () -> shipmentAssignmentService.offerShipment(1L, sampleUser, BigDecimal.TEN));
         assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
-        verify(carrierCompanyRepository, never()).findByManagerEmail(anyString());
+        verify(carrierCompanyRepository, never()).findByAuthenticationEmail(anyString());
     }
 
     @Test
@@ -97,7 +97,7 @@ public class ShipmentAssignmentServiceTest {
         sampleShipment.setStatus(ShipmentStatus.ACCEPTED);
 
         when(shipmentOfferRepository.findById(100L)).thenReturn(Optional.of(sampleOffer));
-        when(carrierCompanyRepository.findByManagerEmail(sampleUser.getUsername()))
+        when(carrierCompanyRepository.findByAuthenticationEmail(sampleUser.getUsername()))
                 .thenReturn(Optional.of(sampleCarrier));
 
         shipmentAssignmentService.cancelShipmentOffer(100L, sampleUser);
@@ -114,7 +114,7 @@ public class ShipmentAssignmentServiceTest {
         differentCarrier.setId(99L);
 
         when(shipmentOfferRepository.findById(100L)).thenReturn(Optional.of(sampleOffer));
-        when(carrierCompanyRepository.findByManagerEmail(sampleUser.getUsername()))
+        when(carrierCompanyRepository.findByAuthenticationEmail(sampleUser.getUsername()))
                 .thenReturn(Optional.of(differentCarrier));
 
         ResponseStatusException exception = assertThrows(ResponseStatusException.class,

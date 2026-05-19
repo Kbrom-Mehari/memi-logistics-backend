@@ -9,5 +9,5 @@ import java.util.Optional;
 
 @Repository
 public interface ShipperProfileRepository extends JpaRepository<ShipperProfile, Long> {
-    Optional<ShipperProfile> findByEmail(String email);
+    Optional<ShipperProfile> findByAuthenticationEmail(String email);
 }

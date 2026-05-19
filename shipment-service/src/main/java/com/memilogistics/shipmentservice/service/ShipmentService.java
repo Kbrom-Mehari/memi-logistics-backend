@@ -31,7 +31,7 @@ public class ShipmentService {
     private final ShipperProfileRepository shipperProfileRepository;
 
     public Shipment createShipment(@CurrentUser CustomUserPrincipal user, CreateShipmentRequest request) {
-        ShipperProfile shipper = shipperProfileRepository.findByEmail(user.getUsername())
+        ShipperProfile shipper = shipperProfileRepository.findByAuthenticationEmail(user.getUsername())
                 .orElseThrow(
                         ()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "Shipper profile not found for user: " + user.getUsername())
                 );

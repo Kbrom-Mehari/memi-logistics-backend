@@ -77,9 +77,9 @@ public class PaymentRecordService {
     }
 
     @Transactional
-    public void confirmPayment(Long shipmentId, @CurrentUser CustomUserPrincipal principal) {
-        CarrierCompany carrierCompany = carrierCompanyRepository.findByManagerEmail(principal.getUsername()).orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Carrier company not found for user: " + principal.getUsername())
+    public void confirmPayment(Long shipmentId, @CurrentUser CustomUserPrincipal user) {
+        CarrierCompany carrierCompany = carrierCompanyRepository.findByAuthenticationEmail(user.getUsername()).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Carrier company not found for user: " + user.getUsername())
         );
 
         Shipment shipment = shipmentRepository.findById(shipmentId).orElseThrow(

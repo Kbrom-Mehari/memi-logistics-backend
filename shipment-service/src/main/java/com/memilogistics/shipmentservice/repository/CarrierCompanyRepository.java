@@ -9,6 +9,5 @@ import java.util.Optional;
 
 @Repository
 public interface CarrierCompanyRepository extends JpaRepository<CarrierCompany, Long> {
-     Optional<CarrierCompany> findByManagerUserId(String managerUserId);
-     Optional<CarrierCompany> findByManagerEmail(String managerEmail);
+     Optional<CarrierCompany> findByAuthenticationEmail(String authenticationEmail);
 }

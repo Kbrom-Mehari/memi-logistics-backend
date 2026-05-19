@@ -87,13 +87,13 @@ public class ShipmentMapper {
         return offers.stream().map(this::toOfferResponse).collect(Collectors.toList());
     }
 
-    private ShipperProfileResponse toShipperProfileResponse(ShipperProfile shipper) {
+    public ShipperProfileResponse toShipperProfileResponse(ShipperProfile shipper) {
         if (shipper == null) {
             return null;
         }
         ShipperProfileResponse response = new ShipperProfileResponse();
         response.setId(shipper.getId());
-        response.setEmail(shipper.getEmail());
+        response.setEmail(shipper.getAuthenticationEmail());
         response.setFirstName(shipper.getFirstName());
         response.setLastName(shipper.getLastName());
         response.setCompanyName(shipper.getCompanyName());
@@ -102,7 +102,7 @@ public class ShipmentMapper {
         return response;
     }
 
-    private CarrierCompanyResponse toCarrierCompanyResponse(CarrierCompany carrier) {
+    public CarrierCompanyResponse toCarrierCompanyResponse(CarrierCompany carrier) {
         if (carrier == null) {
             return null;
         }

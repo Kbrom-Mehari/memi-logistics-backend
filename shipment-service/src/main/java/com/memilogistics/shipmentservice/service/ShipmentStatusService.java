@@ -35,7 +35,7 @@ public class ShipmentStatusService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "COMPLETED status cannot be manually set");
         }
 
-        CarrierCompany carrierCompany = carrierCompanyRepository.findByManagerEmail(user.getUsername())
+        CarrierCompany carrierCompany = carrierCompanyRepository.findByAuthenticationEmail(user.getUsername())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Carrier company not found"));
 
         Shipment shipment = shipmentRepository.findById(shipmentId)
