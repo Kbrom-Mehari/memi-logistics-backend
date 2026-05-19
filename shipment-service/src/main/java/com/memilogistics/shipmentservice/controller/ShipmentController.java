@@ -1,5 +1,7 @@
 package com.memilogistics.shipmentservice.controller;
 
+import com.memilogistics.commonsecurity.annotation.CurrentUser;
+import com.memilogistics.commonsecurity.principal.CustomUserPrincipal;
 import com.memilogistics.shipmentservice.dto.*;
 import com.memilogistics.shipmentservice.entity.Shipment;
 import com.memilogistics.shipmentservice.mapper.ShipmentMapper;
@@ -29,9 +31,11 @@ public class ShipmentController {
     private final ShipmentMapper shipmentMapper;
 
     @PostMapping("/create")
-    public ResponseEntity<ShipmentResponse> createShipment(@RequestBody CreateShipmentRequest request) {
+    public ResponseEntity<ShipmentResponse> createShipment(
+            @RequestBody CreateShipmentRequest request,
+            @CurrentUser CustomUserPrincipal user) {
         try {
-            var shipment = shipmentService.createShipment(request);
+            var shipment = shipmentService.createShipment(user, request);
             URI location = URI.create(String.format("/api/shipments/%d", shipment.getId()));
             return ResponseEntity.created(location).body(shipmentMapper.toResponse(shipment));
         } catch (IllegalArgumentException ex) {

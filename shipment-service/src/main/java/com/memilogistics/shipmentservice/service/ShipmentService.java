@@ -1,13 +1,17 @@
 package com.memilogistics.shipmentservice.service;
 
+import com.memilogistics.commonsecurity.annotation.CurrentUser;
+import com.memilogistics.commonsecurity.principal.CustomUserPrincipal;
 import com.memilogistics.shipmentservice.dto.CreateShipmentRequest;
 import com.memilogistics.shipmentservice.dto.DashboardInformation;
 import com.memilogistics.shipmentservice.dto.UpdateShipmentRequest;
 import com.memilogistics.shipmentservice.entity.Shipment;
 import com.memilogistics.shipmentservice.entity.ShipmentEvent;
 import com.memilogistics.shipmentservice.entity.ShipmentOffer;
+import com.memilogistics.shipmentservice.entity.ShipperProfile;
 import com.memilogistics.shipmentservice.enums.ShipmentStatus;
 import com.memilogistics.shipmentservice.repository.ShipmentRepository;
+import com.memilogistics.shipmentservice.repository.ShipperProfileRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -24,10 +28,17 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class ShipmentService {
     private final ShipmentRepository shipmentRepository;
+    private final ShipperProfileRepository shipperProfileRepository;
 
-    public Shipment createShipment(CreateShipmentRequest request) {
+    public Shipment createShipment(@CurrentUser CustomUserPrincipal user, CreateShipmentRequest request) {
+        ShipperProfile shipper = shipperProfileRepository.findByEmail(user.getUsername())
+                .orElseThrow(
+                        ()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "Shipper profile not found for user: " + user.getUsername())
+                );
 
         Shipment shipment = new Shipment();
+        shipment.setShipper(shipper);
+        shipment.setShipmentItem(request.getShipmentItem());
         shipment.setTrackingNumber(generateTrackingNumber());
         shipment.setOrigin(request.getOrigin());
         shipment.setDestination(request.getDestination());
