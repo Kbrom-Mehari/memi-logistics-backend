@@ -3,11 +3,13 @@ package com.memilogistics.shipmentservice.service;
 import com.memilogistics.commonsecurity.annotation.CurrentUser;
 import com.memilogistics.commonsecurity.principal.CustomUserPrincipal;
 import com.memilogistics.shipmentservice.dto.CreateShipperProfileRequest;
+import com.memilogistics.shipmentservice.dto.ShipperProfileResponse;
 import com.memilogistics.shipmentservice.dto.UpdateShipperProfileRequest;
 import com.memilogistics.shipmentservice.entity.Address;
 import com.memilogistics.shipmentservice.entity.ShipperProfile;
 import com.memilogistics.shipmentservice.repository.AddressRepository;
 import com.memilogistics.shipmentservice.repository.ShipperProfileRepository;
+import com.memilogistics.shipmentservice.mapper.ProfileMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -19,6 +21,7 @@ import org.springframework.web.server.ResponseStatusException;
 public class ShipperProfileService {
     private final ShipperProfileRepository shipperProfileRepository;
     private final AddressRepository addressRepository;
+    private final ProfileMapper profileMapper;
 
     @Transactional
     public ShipperProfile createShipperProfile(@CurrentUser CustomUserPrincipal user,
@@ -85,6 +88,16 @@ public class ShipperProfileService {
         }
 
         return shipperProfileRepository.save(profile);
+    }
+
+    public ShipperProfileResponse getShipperProfile(@CurrentUser CustomUserPrincipal user){
+        if (user == null || user.getUsername() == null || user.getUsername().isBlank()) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User context is required");
+        }
+        ShipperProfile profile = shipperProfileRepository.findByAuthenticationEmail(user.getUsername()).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Shipper profile not found")
+        );
+        return profileMapper.toShipperProfileResponse(profile);
     }
 
     private Address buildAddress(CreateShipperProfileRequest request) {

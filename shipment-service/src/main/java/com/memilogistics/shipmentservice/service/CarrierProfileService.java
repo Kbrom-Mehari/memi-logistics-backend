@@ -6,6 +6,7 @@ import com.memilogistics.shipmentservice.dto.CreateCarrierProfileRequest;
 import com.memilogistics.shipmentservice.dto.UpdateCarrierProfileRequest;
 import com.memilogistics.shipmentservice.entity.Address;
 import com.memilogistics.shipmentservice.entity.CarrierCompany;
+import com.memilogistics.shipmentservice.entity.ShipperProfile;
 import com.memilogistics.shipmentservice.repository.AddressRepository;
 import com.memilogistics.shipmentservice.repository.CarrierCompanyRepository;
 import lombok.RequiredArgsConstructor;
@@ -77,6 +78,12 @@ public class CarrierProfileService {
         }
 
         return carrierCompanyRepository.save(company);
+    }
+
+    public CarrierCompany getCarrierProfile(@CurrentUser CustomUserPrincipal user){
+        return carrierCompanyRepository.findByAuthenticationEmail(user.getUsername()).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Carrier profile not found")
+        );
     }
 
     private Address buildAddress(CreateCarrierProfileRequest request) {

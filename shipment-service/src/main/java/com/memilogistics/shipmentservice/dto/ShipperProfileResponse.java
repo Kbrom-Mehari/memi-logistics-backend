@@ -1,5 +1,6 @@
 package com.memilogistics.shipmentservice.dto;
 
+import com.memilogistics.shipmentservice.entity.Address;
 import lombok.Data;
 
 @Data
@@ -10,6 +11,6 @@ public class ShipperProfileResponse {
     private String lastName;
     private String companyName;
     private String businessName;
-    private AddressResponse address;
+    private Address address;
 }
 

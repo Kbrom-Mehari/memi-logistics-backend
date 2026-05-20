@@ -1,6 +1,5 @@
 package com.memilogistics.shipmentservice.mapper;
 
-import com.memilogistics.shipmentservice.dto.AddressResponse;
 import com.memilogistics.shipmentservice.dto.CarrierCompanyResponse;
 import com.memilogistics.shipmentservice.dto.ShipmentOfferResponse;
 import com.memilogistics.shipmentservice.dto.ShipmentResponse;
@@ -98,7 +97,7 @@ public class ShipmentMapper {
         response.setLastName(shipper.getLastName());
         response.setCompanyName(shipper.getCompanyName());
         response.setBusinessName(shipper.getBusinessName());
-        response.setAddress(toAddressResponse(shipper.getAddress()));
+        response.setAddress(shipper.getAddress());
         return response;
     }
 
@@ -110,22 +109,7 @@ public class ShipmentMapper {
         response.setId(carrier.getId());
         response.setCompanyName(carrier.getCompanyName());
         response.setCompanyEmail(carrier.getCompanyEmail());
-        response.setAddress(toAddressResponse(carrier.getAddress()));
-        return response;
-    }
-
-    private AddressResponse toAddressResponse(Address address) {
-        if (address == null) {
-            return null;
-        }
-
-        AddressResponse response = new AddressResponse();
-        response.setId(address.getId());
-        response.setStreet(address.getStreet());
-        response.setCity(address.getCity());
-        response.setState(address.getState());
-        response.setZipCode(address.getZip());
-        response.setCountry(address.getCountry());
+        response.setAddress(carrier.getAddress());
         return response;
     }
 }
