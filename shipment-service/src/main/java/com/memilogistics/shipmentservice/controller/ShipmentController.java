@@ -3,7 +3,6 @@ package com.memilogistics.shipmentservice.controller;
 import com.memilogistics.commonsecurity.annotation.CurrentUser;
 import com.memilogistics.commonsecurity.principal.CustomUserPrincipal;
 import com.memilogistics.shipmentservice.dto.*;
-import com.memilogistics.shipmentservice.entity.Shipment;
 import com.memilogistics.shipmentservice.mapper.ShipmentMapper;
 import com.memilogistics.shipmentservice.service.ShipmentService;
 import lombok.RequiredArgsConstructor;
@@ -31,13 +30,13 @@ public class ShipmentController {
     private final ShipmentMapper shipmentMapper;
 
     @PostMapping("/create")
-    public ResponseEntity<ShipmentResponse> createShipment(
+    public ResponseEntity<CreateShipmentResponse> createShipment(
             @RequestBody CreateShipmentRequest request,
             @CurrentUser CustomUserPrincipal user) {
         try {
             var shipment = shipmentService.createShipment(user, request);
-            URI location = URI.create(String.format("/api/shipments/%d", shipment.getId()));
-            return ResponseEntity.created(location).body(shipmentMapper.toResponse(shipment));
+            URI location = URI.create(String.format("/api/shipments/tracking/%s", shipment.getTrackingNumber()));
+            return ResponseEntity.created(location).body(shipment);
         } catch (IllegalArgumentException ex) {
             String message = ex.getMessage() == null ? "Invalid request" : ex.getMessage();
             if (message.toLowerCase().contains("already exists")) {
