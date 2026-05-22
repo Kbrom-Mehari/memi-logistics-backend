@@ -21,5 +21,6 @@ public class CreateShipmentRequest {
     private BigDecimal weightKg;
     @NotNull(message = "Delivery date is required")
     private LocalDate deliveryDate;
+    private String description;
     private boolean fragile;
 }
