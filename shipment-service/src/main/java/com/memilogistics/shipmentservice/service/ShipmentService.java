@@ -3,6 +3,7 @@ package com.memilogistics.shipmentservice.service;
 import com.memilogistics.commonsecurity.annotation.CurrentUser;
 import com.memilogistics.commonsecurity.principal.CustomUserPrincipal;
 import com.memilogistics.shipmentservice.dto.CreateShipmentRequest;
+import com.memilogistics.shipmentservice.dto.CreateShipmentResponse;
 import com.memilogistics.shipmentservice.dto.DashboardInformation;
 import com.memilogistics.shipmentservice.dto.UpdateShipmentRequest;
 import com.memilogistics.shipmentservice.entity.Shipment;
@@ -12,6 +13,7 @@ import com.memilogistics.shipmentservice.entity.ShipperProfile;
 import com.memilogistics.shipmentservice.enums.ShipmentStatus;
 import com.memilogistics.shipmentservice.repository.ShipmentRepository;
 import com.memilogistics.shipmentservice.repository.ShipperProfileRepository;
+import com.memilogistics.shipmentservice.mapper.ShipmentMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -29,8 +31,9 @@ import java.util.UUID;
 public class ShipmentService {
     private final ShipmentRepository shipmentRepository;
     private final ShipperProfileRepository shipperProfileRepository;
+    private final ShipmentMapper shipmentMapper;
 
-    public Shipment createShipment(@CurrentUser CustomUserPrincipal user, CreateShipmentRequest request) {
+    public CreateShipmentResponse createShipment(@CurrentUser CustomUserPrincipal user, CreateShipmentRequest request) {
         ShipperProfile shipper = shipperProfileRepository.findByAuthenticationEmail(user.getUsername())
                 .orElseThrow(
                         ()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "Shipper profile not found for user: " + user.getUsername())
@@ -45,6 +48,7 @@ public class ShipmentService {
         shipment.setWeightKg(request.getWeightKg());
         shipment.setEstimatedDeliveryDate(request.getDeliveryDate());
         shipment.setFragile(request.isFragile());
+        shipment.setDescription(request.getDescription());
 
         shipmentRepository.findByTrackingNumber(shipment.getTrackingNumber())
                 .ifPresent(existing -> {
@@ -58,7 +62,8 @@ public class ShipmentService {
         event.setEventTimestamp(shipment.getCreatedAt() != null ? shipment.getCreatedAt() : LocalDateTime.now());
         shipment.getShipmentEvents().add(event);
 
-        return shipmentRepository.save(shipment);
+        Shipment saved = shipmentRepository.save(shipment);
+        return shipmentMapper.toCreateShipmentResponse(saved);
     }
 
     public Shipment getShipment(Long id) {
