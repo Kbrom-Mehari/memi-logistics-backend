@@ -1,6 +1,7 @@
 package com.memilogistics.shipmentservice.mapper;
 
 import com.memilogistics.shipmentservice.dto.CarrierCompanyResponse;
+import com.memilogistics.shipmentservice.dto.CreateShipmentResponse;
 import com.memilogistics.shipmentservice.dto.ShipmentOfferResponse;
 import com.memilogistics.shipmentservice.dto.ShipmentResponse;
 import com.memilogistics.shipmentservice.dto.ShipperProfileResponse;
@@ -110,6 +111,26 @@ public class ShipmentMapper {
         response.setCompanyName(carrier.getCompanyName());
         response.setCompanyEmail(carrier.getCompanyEmail());
         response.setAddress(carrier.getAddress());
+        return response;
+    }
+
+    public CreateShipmentResponse toCreateShipmentResponse(Shipment shipment) {
+        if (shipment == null) {
+            return null;
+        }
+
+        CreateShipmentResponse response = new CreateShipmentResponse();
+        response.setShipmentId(shipment.getId());
+        response.setTrackingNumber(shipment.getTrackingNumber());
+        response.setOrigin(shipment.getOrigin());
+        response.setDestination(shipment.getDestination());
+        response.setWeightKg(shipment.getWeightKg());
+        response.setEstimatedDeliveryDate(shipment.getEstimatedDeliveryDate());
+        response.setShipmentItem(shipment.getShipmentItem());
+        response.setDescription(shipment.getDescription());
+        response.setFragile(shipment.isFragile());
+        response.setStatus(shipment.getStatus());
+        response.setCreatedAt(shipment.getCreatedAt());
         return response;
     }
 }
