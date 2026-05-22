@@ -2,6 +2,7 @@ package com.memilogistics.shipmentservice.service;
 
 import com.memilogistics.commonsecurity.principal.CustomUserPrincipal;
 import com.memilogistics.shipmentservice.dto.CreateShipmentRequest;
+import com.memilogistics.shipmentservice.dto.CreateShipmentResponse;
 import com.memilogistics.shipmentservice.dto.DashboardInformation;
 import com.memilogistics.shipmentservice.dto.UpdateShipmentRequest;
 import com.memilogistics.shipmentservice.entity.Shipment;
@@ -9,6 +10,7 @@ import com.memilogistics.shipmentservice.entity.ShipperProfile;
 import com.memilogistics.shipmentservice.enums.ShipmentStatus;
 import com.memilogistics.shipmentservice.repository.ShipmentRepository;
 import com.memilogistics.shipmentservice.repository.ShipperProfileRepository;
+import com.memilogistics.shipmentservice.mapper.ShipmentMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -37,6 +39,9 @@ public class ShipmentServiceTest {
 
     @Mock
     private ShipperProfileRepository shipperProfileRepository;
+
+    @org.mockito.Spy
+    private ShipmentMapper shipmentMapper;
 
     @InjectMocks
     private ShipmentService shipmentService;
@@ -76,22 +81,22 @@ public class ShipmentServiceTest {
         request.setDeliveryDate(LocalDate.now().plusDays(5));
         request.setFragile(true);
         request.setShipmentItem("Electronics");
+        request.setDescription("Handle with care");
 
         when(shipperProfileRepository.findByAuthenticationEmail(sampleUser.getUsername()))
                 .thenReturn(Optional.of(sampleShipper));
         when(shipmentRepository.findByTrackingNumber(anyString())).thenReturn(Optional.empty());
         when(shipmentRepository.save(any(Shipment.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        Shipment createdShipment = shipmentService.createShipment(sampleUser, request);
+        CreateShipmentResponse createdShipment = shipmentService.createShipment(sampleUser, request);
 
         assertNotNull(createdShipment);
         assertNotNull(createdShipment.getTrackingNumber());
         assertEquals("Los Angeles", createdShipment.getOrigin());
         assertEquals("New York", createdShipment.getDestination());
         assertEquals("Electronics", createdShipment.getShipmentItem());
+        assertEquals("Handle with care", createdShipment.getDescription());
         assertTrue(createdShipment.isFragile());
-        assertEquals(sampleShipper, createdShipment.getShipper());
-        assertEquals(1, createdShipment.getShipmentEvents().size());
 
         verify(shipmentRepository).save(any(Shipment.class));
     }
