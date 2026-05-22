@@ -2,10 +2,7 @@ package com.memilogistics.shipmentservice.service;
 
 import com.memilogistics.commonsecurity.annotation.CurrentUser;
 import com.memilogistics.commonsecurity.principal.CustomUserPrincipal;
-import com.memilogistics.shipmentservice.dto.CreateShipmentRequest;
-import com.memilogistics.shipmentservice.dto.CreateShipmentResponse;
-import com.memilogistics.shipmentservice.dto.DashboardInformation;
-import com.memilogistics.shipmentservice.dto.UpdateShipmentRequest;
+import com.memilogistics.shipmentservice.dto.*;
 import com.memilogistics.shipmentservice.entity.Shipment;
 import com.memilogistics.shipmentservice.entity.ShipmentEvent;
 import com.memilogistics.shipmentservice.entity.ShipmentOffer;
@@ -15,6 +12,7 @@ import com.memilogistics.shipmentservice.repository.ShipmentRepository;
 import com.memilogistics.shipmentservice.repository.ShipperProfileRepository;
 import com.memilogistics.shipmentservice.mapper.ShipmentMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -76,32 +74,62 @@ public class ShipmentService {
         return shipment.getShipmentOffers();
     }
 
-    public Shipment getShipmentByTrackingNumber(String trackingNumber) {
+    public ShipmentResponse getShipmentByTrackingNumber(String trackingNumber) {
         if (trackingNumber == null || trackingNumber.isBlank()) {
             throw new IllegalArgumentException("Tracking number is required");
         }
-        return shipmentRepository.findByTrackingNumber(trackingNumber)
+        var shipment = shipmentRepository.findByTrackingNumber(trackingNumber)
                 .orElseThrow(() -> new IllegalArgumentException("Shipment not found with tracking number: " + trackingNumber));
+        return shipmentMapper.toResponse(shipment);
     }
 
-    public List<Shipment> listShipments(int page, int size) {
+    public List<ShipmentResponse> listShipments(int page, int size) {
         Pageable pageable = PageRequest.of(Math.max(page, 0), Math.max(size, 1));
-        return shipmentRepository.findAll(pageable).getContent();
+        var shipments = shipmentRepository.findAll(pageable).getContent();
+        return shipmentMapper.toResponseList(shipments);
     }
 
-    public List<Shipment> listShipmentsByFragile(boolean fragile, int page, int size) {
+    public List<ShipmentResponse> listShipmentsByFragile(boolean fragile, int page, int size) {
         Pageable pageable = PageRequest.of(Math.max(page, 0), Math.max(size, 1));
-        return shipmentRepository.findAllByFragile(fragile, pageable).orElse(List.of());
+        var shipments = shipmentRepository.findAllByFragile(fragile, pageable).orElse(List.of());
+        return shipmentMapper.toResponseList(shipments);
     }
 
-    public List<Shipment> listShipmentsByDestination(String destination, int page, int size) {
+    public List<ShipmentResponse> listShipmentsByDestination(String destination, int page, int size) {
         Pageable pageable = PageRequest.of(Math.max(page, 0), Math.max(size, 1));
-        return shipmentRepository.findAllByDestination(destination, pageable);
+        var shipments = shipmentRepository.findAllByDestination(destination, pageable);
+        return shipmentMapper.toResponseList(shipments);
     }
 
-    public List<Shipment> listShipmentsByOrigin(String origin, int page, int size) {
+    public List<ShipmentResponse> listShipmentsByOrigin(String origin, int page, int size) {
         Pageable pageable = PageRequest.of(Math.max(page, 0), Math.max(size, 1));
-        return shipmentRepository.findAllByOrigin(origin, pageable);
+        var shipments = shipmentRepository.findAllByOrigin(origin, pageable);
+        return shipmentMapper.toResponseList(shipments);
+    }
+
+    public Page<ShipmentResponse> findCurrentUserShipments(
+            @CurrentUser CustomUserPrincipal user,
+            int page,
+            int size
+    ){
+        var email = user.getUsername();
+        Pageable pageable = PageRequest.of(Math.max(page, 0), Math.max(size, 1));
+
+        return shipmentRepository.findByShipperAuthenticationEmail(email, pageable)
+                .map(shipmentMapper::toResponse);
+    }
+
+    public Page<ShipmentResponse> findCurrentUserShipmentsByStatus(
+            @CurrentUser CustomUserPrincipal user,
+            ShipmentStatus status,
+            int page,
+            int size
+    ){
+        var email = user.getUsername();
+        Pageable pageable = PageRequest.of(Math.max(page, 0), Math.max(size, 1));
+        Page<Shipment> shipments = shipmentRepository.findByShipperAuthenticationEmailAndStatus(email, status, pageable);
+
+        return shipments.map(shipmentMapper::toResponse);
     }
 
     @Transactional

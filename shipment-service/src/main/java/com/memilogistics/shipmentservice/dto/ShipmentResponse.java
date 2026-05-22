@@ -25,7 +25,7 @@ public class ShipmentResponse {
     private LocalDateTime updatedAt;
     private LocalDateTime completedAt;
     
-    private ShipperProfileResponse shipper;
-    private CarrierCompanyResponse assignedCarrier;
+    private Long shipperId;
+    private Long assignedCarrierId;
 }
 

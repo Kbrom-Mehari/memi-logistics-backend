@@ -2,11 +2,13 @@ package com.memilogistics.shipmentservice.service;
 
 import com.memilogistics.commonsecurity.annotation.CurrentUser;
 import com.memilogistics.commonsecurity.principal.CustomUserPrincipal;
+import com.memilogistics.shipmentservice.dto.CarrierCompanyResponse;
 import com.memilogistics.shipmentservice.dto.CreateCarrierProfileRequest;
 import com.memilogistics.shipmentservice.dto.UpdateCarrierProfileRequest;
 import com.memilogistics.shipmentservice.entity.Address;
 import com.memilogistics.shipmentservice.entity.CarrierCompany;
 import com.memilogistics.shipmentservice.entity.ShipperProfile;
+import com.memilogistics.shipmentservice.mapper.ProfileMapper;
 import com.memilogistics.shipmentservice.repository.AddressRepository;
 import com.memilogistics.shipmentservice.repository.CarrierCompanyRepository;
 import lombok.RequiredArgsConstructor;
@@ -20,9 +22,10 @@ import org.springframework.web.server.ResponseStatusException;
 public class CarrierProfileService {
     private final CarrierCompanyRepository carrierCompanyRepository;
     private final AddressRepository addressRepository;
+    private final ProfileMapper profileMapper;
 
     @Transactional
-    public CarrierCompany createCarrierCompanyProfile(@CurrentUser CustomUserPrincipal user,
+    public CarrierCompanyResponse createCarrierCompanyProfile(@CurrentUser CustomUserPrincipal user,
                                                       CreateCarrierProfileRequest request) {
         if (user == null || user.getUsername() == null || user.getUsername().isBlank()) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User context is required");
@@ -44,12 +47,13 @@ public class CarrierProfileService {
         company.setCompanyEmail(request.getCompanyEmail());
         company.setAddress(address);
 
-        return carrierCompanyRepository.save(company);
+        var carrierCompany = carrierCompanyRepository.save(company);
+        return profileMapper.toCarrierCompanyResponse(carrierCompany);
     }
 
     @Transactional
-    public CarrierCompany updateCarrierCompanyProfile(@CurrentUser CustomUserPrincipal user,
-                                                      UpdateCarrierProfileRequest request) {
+    public CarrierCompanyResponse updateCarrierCompanyProfile(@CurrentUser CustomUserPrincipal user,
+                                                              UpdateCarrierProfileRequest request) {
         if (user == null || user.getUsername() == null || user.getUsername().isBlank()) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User context is required");
         }
@@ -77,14 +81,26 @@ public class CarrierProfileService {
             company.setAddress(address);
         }
 
-        return carrierCompanyRepository.save(company);
+        var carrierCompany = carrierCompanyRepository.save(company);
+        return profileMapper.toCarrierCompanyResponse(carrierCompany);
     }
 
-    public CarrierCompany getCarrierProfile(@CurrentUser CustomUserPrincipal user){
-        return carrierCompanyRepository.findByAuthenticationEmail(user.getUsername()).orElseThrow(
+    public CarrierCompanyResponse getCarrierProfile(@CurrentUser CustomUserPrincipal user){
+        var profile = carrierCompanyRepository.findByAuthenticationEmail(user.getUsername()).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Carrier profile not found")
         );
+
+        return profileMapper.toCarrierCompanyResponse(profile);
     }
+
+    public CarrierCompanyResponse getCarrierCompany(Long carrierCompanyId) {
+        var company = carrierCompanyRepository.findById(carrierCompanyId).orElseThrow(
+                ()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "Carrier company not found with id: " + carrierCompanyId)
+        );
+        return profileMapper.toCarrierCompanyResponse(company);
+    }
+
+
 
     private Address buildAddress(CreateCarrierProfileRequest request) {
         Address address = new Address();

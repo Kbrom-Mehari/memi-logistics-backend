@@ -13,7 +13,6 @@ public class ProfileMapper {
         if (shipper == null) {
             return null;
         }
-
         ShipperProfileResponse response = new ShipperProfileResponse();
         response.setId(shipper.getId());
         response.setEmail(shipper.getAuthenticationEmail());
@@ -21,7 +20,12 @@ public class ProfileMapper {
         response.setLastName(shipper.getLastName());
         response.setCompanyName(shipper.getCompanyName());
         response.setBusinessName(shipper.getBusinessName());
-        response.setAddress(shipper.getAddress());
+        response.setStreet(shipper.getAddress().getStreet());
+        response.setCity(shipper.getAddress().getCity());
+        response.setZip(shipper.getAddress().getZip());
+        response.setState(shipper.getAddress().getState());
+        response.setCountry(shipper.getAddress().getCountry());
+        response.setPhoneNumber(shipper.getAddress().getPhoneNumber());
         return response;
     }
 
@@ -29,14 +33,19 @@ public class ProfileMapper {
         if (carrier == null) {
             return null;
         }
-
         CarrierCompanyResponse response = new CarrierCompanyResponse();
         response.setId(carrier.getId());
         response.setCompanyName(carrier.getCompanyName());
         response.setCompanyEmail(carrier.getCompanyEmail());
-        response.setAddress(carrier.getAddress());
+        response.setStreet(carrier.getAddress().getStreet());
+        response.setCity(carrier.getAddress().getCity());
+        response.setState(carrier.getAddress().getState());
+        response.setCountry(carrier.getAddress().getCountry());
+        response.setZip(carrier.getAddress().getZip());
+        response.setPhoneNumber(carrier.getAddress().getPhoneNumber());
         return response;
     }
+
 
 }
 

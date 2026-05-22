@@ -18,25 +18,28 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class CarrierProfileController {
     private final CarrierProfileService carrierProfileService;
-    private final ProfileMapper profileMapper;
 
     @GetMapping("/me")
     public ResponseEntity<CarrierCompanyResponse> getProfile(@CurrentUser CustomUserPrincipal user) {
-        var profile = carrierProfileService.getCarrierProfile(user);
-        return ResponseEntity.ok(profileMapper.toCarrierCompanyResponse(profile));
+        return ResponseEntity.ok(carrierProfileService.getCarrierProfile(user));
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<CarrierCompanyResponse> getCarrierCompany(@PathVariable("id") Long id) {
+        return ResponseEntity.ok(carrierProfileService.getCarrierCompany(id));
     }
 
     @PostMapping("/create")
     public ResponseEntity<CarrierCompanyResponse> createProfile(@CurrentUser CustomUserPrincipal user,
                                                                 @Valid @RequestBody CreateCarrierProfileRequest request) {
         var profile = carrierProfileService.createCarrierCompanyProfile(user, request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(profileMapper.toCarrierCompanyResponse(profile));
+        return ResponseEntity.status(HttpStatus.CREATED).body(profile);
     }
 
     @PatchMapping("/update")
     public ResponseEntity<CarrierCompanyResponse> updateProfile(@CurrentUser CustomUserPrincipal user,
                                                                 @Valid @RequestBody UpdateCarrierProfileRequest request) {
         var profile = carrierProfileService.updateCarrierCompanyProfile(user, request);
-        return ResponseEntity.ok(profileMapper.toCarrierCompanyResponse(profile));
+        return ResponseEntity.ok(profile);
     }
 }

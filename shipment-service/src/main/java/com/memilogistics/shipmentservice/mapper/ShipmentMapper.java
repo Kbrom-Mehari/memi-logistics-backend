@@ -10,13 +10,16 @@ import com.memilogistics.shipmentservice.entity.CarrierCompany;
 import com.memilogistics.shipmentservice.entity.Shipment;
 import com.memilogistics.shipmentservice.entity.ShipmentOffer;
 import com.memilogistics.shipmentservice.entity.ShipperProfile;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
+@RequiredArgsConstructor
 public class ShipmentMapper {
+    private final ProfileMapper profileMapper;
 
     public ShipmentResponse toResponse(Shipment shipment) {
         if (shipment == null) {
@@ -41,11 +44,11 @@ public class ShipmentMapper {
         response.setCompletedAt(shipment.getCompletedAt());
 
         if (shipment.getShipper() != null) {
-            response.setShipper(toShipperProfileResponse(shipment.getShipper()));
+            response.setShipperId(shipment.getShipper().getId());
         }
 
         if (shipment.getAssignedCarrier() != null) {
-            response.setAssignedCarrier(toCarrierCompanyResponse(shipment.getAssignedCarrier()));
+            response.setAssignedCarrierId(shipment.getAssignedCarrier().getId());
         }
 
         return response;
@@ -74,7 +77,7 @@ public class ShipmentMapper {
         }
 
         if (offer.getCarrierCompany() != null) {
-            response.setCarrierCompany(toCarrierCompanyResponse(offer.getCarrierCompany()));
+            response.setCarrierCompany(profileMapper.toCarrierCompanyResponse(offer.getCarrierCompany()));
         }
 
         return response;
@@ -85,33 +88,6 @@ public class ShipmentMapper {
             return null;
         }
         return offers.stream().map(this::toOfferResponse).collect(Collectors.toList());
-    }
-
-    public ShipperProfileResponse toShipperProfileResponse(ShipperProfile shipper) {
-        if (shipper == null) {
-            return null;
-        }
-        ShipperProfileResponse response = new ShipperProfileResponse();
-        response.setId(shipper.getId());
-        response.setEmail(shipper.getAuthenticationEmail());
-        response.setFirstName(shipper.getFirstName());
-        response.setLastName(shipper.getLastName());
-        response.setCompanyName(shipper.getCompanyName());
-        response.setBusinessName(shipper.getBusinessName());
-        response.setAddress(shipper.getAddress());
-        return response;
-    }
-
-    public CarrierCompanyResponse toCarrierCompanyResponse(CarrierCompany carrier) {
-        if (carrier == null) {
-            return null;
-        }
-        CarrierCompanyResponse response = new CarrierCompanyResponse();
-        response.setId(carrier.getId());
-        response.setCompanyName(carrier.getCompanyName());
-        response.setCompanyEmail(carrier.getCompanyEmail());
-        response.setAddress(carrier.getAddress());
-        return response;
     }
 
     public CreateShipmentResponse toCreateShipmentResponse(Shipment shipment) {

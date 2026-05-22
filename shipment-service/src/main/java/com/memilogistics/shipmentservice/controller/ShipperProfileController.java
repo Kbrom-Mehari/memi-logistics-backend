@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class ShipperProfileController {
     private final ShipperProfileService shipperProfileService;
-    private final ShipmentMapper shipmentMapper;
 
     @GetMapping("/me")
     public ResponseEntity<ShipperProfileResponse> getProfile(@CurrentUser CustomUserPrincipal user) {
@@ -26,17 +25,22 @@ public class ShipperProfileController {
         return ResponseEntity.ok(profile);
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<ShipperProfileResponse> getProfileById(@PathVariable Long id) {
+        return ResponseEntity.ok(shipperProfileService.getShipperProfile(id));
+    }
+
     @PostMapping("create")
     public ResponseEntity<ShipperProfileResponse> createProfile(@CurrentUser CustomUserPrincipal user,
                                                                 @Valid @RequestBody CreateShipperProfileRequest request) {
         var profile = shipperProfileService.createShipperProfile(user, request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(shipmentMapper.toShipperProfileResponse(profile));
+        return ResponseEntity.status(HttpStatus.CREATED).body(profile);
     }
 
     @PatchMapping("update")
     public ResponseEntity<ShipperProfileResponse> updateProfile(@CurrentUser CustomUserPrincipal user,
                                                                 @Valid @RequestBody UpdateShipperProfileRequest request) {
         var profile = shipperProfileService.updateShipperProfile(user, request);
-        return ResponseEntity.ok(shipmentMapper.toShipperProfileResponse(profile));
+        return ResponseEntity.ok(profile);
     }
 }

@@ -5,7 +5,9 @@ import com.memilogistics.commonsecurity.principal.CustomUserPrincipal;
 import com.memilogistics.shipmentservice.dto.*;
 import com.memilogistics.shipmentservice.mapper.ShipmentMapper;
 import com.memilogistics.shipmentservice.service.ShipmentService;
+import com.memilogistics.shipmentservice.enums.ShipmentStatus;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -65,7 +67,7 @@ public class ShipmentController {
     public ResponseEntity<ShipmentResponse> getShipmentByTrackingNumber(@PathVariable("trackingNumber") String trackingNumber) {
         try {
             var shipment = shipmentService.getShipmentByTrackingNumber(trackingNumber);
-            return ResponseEntity.ok(shipmentMapper.toResponse(shipment));
+            return ResponseEntity.ok(shipment);
         } catch (IllegalArgumentException ex) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, ex.getMessage(), ex);
         }
@@ -87,7 +89,7 @@ public class ShipmentController {
     public ResponseEntity<List<ShipmentResponse>> listShipments(@RequestParam(name = "page", defaultValue = "0") int page,
                                         @RequestParam(name = "size", defaultValue = "20") int size) {
         var shipments = shipmentService.listShipments(page, size);
-        return ResponseEntity.ok(shipmentMapper.toResponseList(shipments));
+        return ResponseEntity.ok(shipments);
     }
 
     @GetMapping("/list/fragile")
@@ -95,7 +97,7 @@ public class ShipmentController {
                                                  @RequestParam(name = "page", defaultValue = "0") int page,
                                                  @RequestParam(name = "size", defaultValue = "20") int size) {
         var shipments = shipmentService.listShipmentsByFragile(fragile, page, size);
-        return ResponseEntity.ok(shipmentMapper.toResponseList(shipments));
+        return ResponseEntity.ok(shipments);
     }
 
     @GetMapping("/list-by-destination/{destination}")
@@ -103,7 +105,7 @@ public class ShipmentController {
                                                                      @RequestParam(name = "page", defaultValue = "0") int page,
                                                                      @RequestParam(name = "size", defaultValue = "20") int size) {
         var shipments = shipmentService.listShipmentsByDestination(destination, page, size);
-        return ResponseEntity.ok(shipmentMapper.toResponseList(shipments));
+        return ResponseEntity.ok(shipments);
     }
 
     @GetMapping("/list-by-origin/{origin}")
@@ -111,7 +113,7 @@ public class ShipmentController {
                                                                 @RequestParam(name = "page", defaultValue = "0") int page,
                                                                 @RequestParam(name = "size", defaultValue = "20") int size) {
         var shipments = shipmentService.listShipmentsByOrigin(origin, page, size);
-        return ResponseEntity.ok(shipmentMapper.toResponseList(shipments));
+        return ResponseEntity.ok(shipments);
     }
 
     @GetMapping("/dashboard")
@@ -130,6 +132,25 @@ public class ShipmentController {
             }
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, message, ex);
         }
+    }
+
+    @GetMapping("/my")
+    public ResponseEntity<Page<ShipmentResponse>> listMyShipments(
+            @CurrentUser CustomUserPrincipal user,
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "size", defaultValue = "20") int size
+    ) {
+        return ResponseEntity.ok(shipmentService.findCurrentUserShipments(user, page, size));
+    }
+
+    @GetMapping("/my/status")
+    public ResponseEntity<Page<ShipmentResponse>> listMyShipmentsByStatus(
+            @CurrentUser CustomUserPrincipal user,
+            @RequestParam("status") ShipmentStatus status,
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "size", defaultValue = "20") int size
+    ) {
+        return ResponseEntity.ok(shipmentService.findCurrentUserShipmentsByStatus(user, status, page, size));
     }
 
 }

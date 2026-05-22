@@ -24,7 +24,7 @@ public class ShipperProfileService {
     private final ProfileMapper profileMapper;
 
     @Transactional
-    public ShipperProfile createShipperProfile(@CurrentUser CustomUserPrincipal user,
+    public ShipperProfileResponse createShipperProfile(@CurrentUser CustomUserPrincipal user,
                                                CreateShipperProfileRequest request) {
         if (user == null || user.getUsername() == null || user.getUsername().isBlank()) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User context is required");
@@ -48,11 +48,12 @@ public class ShipperProfileService {
         profile.setBusinessName(request.getBusinessName());
         profile.setAddress(address);
 
-        return shipperProfileRepository.save(profile);
+        var shipperProfile = shipperProfileRepository.save(profile);
+        return profileMapper.toShipperProfileResponse(shipperProfile);
     }
 
     @Transactional
-    public ShipperProfile updateShipperProfile(@CurrentUser CustomUserPrincipal user,
+    public ShipperProfileResponse updateShipperProfile(@CurrentUser CustomUserPrincipal user,
                                                UpdateShipperProfileRequest request) {
         if (user == null || user.getUsername() == null || user.getUsername().isBlank()) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User context is required");
@@ -87,7 +88,8 @@ public class ShipperProfileService {
             profile.setAddress(address);
         }
 
-        return shipperProfileRepository.save(profile);
+        var shipperProfile = shipperProfileRepository.save(profile);
+        return profileMapper.toShipperProfileResponse(shipperProfile);
     }
 
     public ShipperProfileResponse getShipperProfile(@CurrentUser CustomUserPrincipal user){
@@ -96,6 +98,13 @@ public class ShipperProfileService {
         }
         ShipperProfile profile = shipperProfileRepository.findByAuthenticationEmail(user.getUsername()).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Shipper profile not found")
+        );
+        return profileMapper.toShipperProfileResponse(profile);
+    }
+
+    public ShipperProfileResponse getShipperProfile(Long shipperId){
+        var profile = shipperProfileRepository.findById(shipperId).orElseThrow(
+                ()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "Shipper profile not found with id: " + shipperId)
         );
         return profileMapper.toShipperProfileResponse(profile);
     }
