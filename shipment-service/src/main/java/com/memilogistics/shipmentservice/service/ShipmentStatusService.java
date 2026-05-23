@@ -2,6 +2,7 @@ package com.memilogistics.shipmentservice.service;
 
 import com.memilogistics.commonsecurity.annotation.CurrentUser;
 import com.memilogistics.commonsecurity.principal.CustomUserPrincipal;
+import com.memilogistics.shipmentservice.dto.ShipmentResponse;
 import com.memilogistics.shipmentservice.dto.StatusUpdateRequest;
 import com.memilogistics.shipmentservice.entity.CarrierCompany;
 import com.memilogistics.shipmentservice.entity.DeliveryConfirmation;
@@ -9,6 +10,7 @@ import com.memilogistics.shipmentservice.entity.Shipment;
 import com.memilogistics.shipmentservice.entity.ShipmentEvent;
 import com.memilogistics.shipmentservice.enums.ShipmentStatus;
 import com.memilogistics.shipmentservice.exception.InvalidShipmentStatusTransitionException;
+import com.memilogistics.shipmentservice.mapper.ShipmentMapper;
 import com.memilogistics.shipmentservice.repository.CarrierCompanyRepository;
 import com.memilogistics.shipmentservice.repository.ShipmentRepository;
 import lombok.RequiredArgsConstructor;
@@ -24,9 +26,13 @@ import java.time.LocalDateTime;
 public class ShipmentStatusService {
     private final ShipmentRepository shipmentRepository;
     private final CarrierCompanyRepository carrierCompanyRepository;
+    private final ShipmentMapper shipmentMapper;
 
     @Transactional
-    public Shipment updateShipmentStatus(Long shipmentId, StatusUpdateRequest request, @CurrentUser CustomUserPrincipal user) {
+    public ShipmentResponse updateShipmentStatus(Long shipmentId,
+                                                 StatusUpdateRequest request,
+                                                 @CurrentUser CustomUserPrincipal user
+    ) {
         if (request.getStatus() == null) {
             throw new IllegalArgumentException("Shipment status is required");
         }
@@ -81,7 +87,8 @@ public class ShipmentStatusService {
                 );
         shipment.addShipmentEvent(shipmentEvent);
 
-        return shipmentRepository.save(shipment);
+        shipmentRepository.save(shipment);
+        return shipmentMapper.toResponse(shipment);
     }
 
     private ShipmentEvent createShipmentEvent(
