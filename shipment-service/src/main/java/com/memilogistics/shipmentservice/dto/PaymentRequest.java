@@ -10,7 +10,7 @@ import java.util.Currency;
 @Getter
 @Setter
 public class PaymentRequest {
-    private Currency currency;
+    private String currencyCode;
     private BigDecimal amount;
     private PaymentMethod paymentMethod;
     private String note;
