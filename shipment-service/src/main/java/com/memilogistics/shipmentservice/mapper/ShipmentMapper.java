@@ -77,7 +77,7 @@ public class ShipmentMapper {
         }
 
         if (offer.getCarrierCompany() != null) {
-            response.setCarrierCompany(profileMapper.toCarrierCompanyResponse(offer.getCarrierCompany()));
+            response.setCarrierCompanyId(offer.getCarrierCompany().getId());
         }
 
         return response;
