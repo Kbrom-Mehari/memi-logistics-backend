@@ -2,6 +2,7 @@ package com.memilogistics.shipmentservice.controller;
 
 import com.memilogistics.commonsecurity.annotation.CurrentUser;
 import com.memilogistics.commonsecurity.principal.CustomUserPrincipal;
+import com.memilogistics.shipmentservice.dto.ShipmentResponse;
 import com.memilogistics.shipmentservice.dto.StatusUpdateRequest;
 import com.memilogistics.shipmentservice.entity.Shipment;
 import com.memilogistics.shipmentservice.service.ShipmentStatusService;
@@ -21,9 +22,9 @@ public class ShipmentStatusController {
 
     @PatchMapping("/{shipmentId}/update-status")
     @PreAuthorize("hasRole('CARRIER') or hasRole('ADMIN')")
-    public ResponseEntity<Shipment> updateShipmentStatus(@PathVariable("shipmentId") Long id,
-                                                         @RequestBody StatusUpdateRequest request,
-                                                         @CurrentUser CustomUserPrincipal user
+    public ResponseEntity<ShipmentResponse> updateShipmentStatus(@PathVariable("shipmentId") Long id,
+                                                                 @RequestBody StatusUpdateRequest request,
+                                                                 @CurrentUser CustomUserPrincipal user
                                                          ) {
         if (request == null || request.getStatus() == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Shipment status is required");
