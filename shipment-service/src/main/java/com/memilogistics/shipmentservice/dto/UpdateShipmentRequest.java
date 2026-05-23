@@ -14,4 +14,5 @@ public class UpdateShipmentRequest {
     private BigDecimal weightKg;
     private LocalDate deliveryDate;
     private ShipmentStatus status;
+    private String description;
 }

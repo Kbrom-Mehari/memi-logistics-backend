@@ -153,6 +153,10 @@ public class ShipmentService {
             existing.setEstimatedDeliveryDate(update.getDeliveryDate());
         }
 
+        if(update.getDescription() != null) {
+            existing.setDescription(update.getDescription());
+        }
+
         return shipmentRepository.save(existing);
     }
 
