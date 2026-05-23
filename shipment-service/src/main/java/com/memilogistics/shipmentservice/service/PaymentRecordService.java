@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
+import java.util.Currency;
 
 @Service
 @RequiredArgsConstructor
@@ -65,6 +66,7 @@ public class PaymentRecordService {
         );
 
         paymentRecord.setNote(request.getNote());
+        paymentRecord.setCurrency(Currency.getInstance(request.getCurrencyCode()));
 
         shipment.setPaymentRecord(paymentRecord);
 
