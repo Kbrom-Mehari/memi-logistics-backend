@@ -12,6 +12,6 @@ public class ShipmentOfferResponse {
     private BigDecimal price;
     private Long shipmentId;
     private String shipmentTrackingNumber;
-    private CarrierCompanyResponse carrierCompany;
+    private Long carrierCompanyId;
 }
 
