@@ -1,15 +1,10 @@
 package com.memilogistics.shipmentservice.mapper;
 
-import com.memilogistics.shipmentservice.dto.CarrierCompanyResponse;
 import com.memilogistics.shipmentservice.dto.CreateShipmentResponse;
 import com.memilogistics.shipmentservice.dto.ShipmentOfferResponse;
 import com.memilogistics.shipmentservice.dto.ShipmentResponse;
-import com.memilogistics.shipmentservice.dto.ShipperProfileResponse;
-import com.memilogistics.shipmentservice.entity.Address;
-import com.memilogistics.shipmentservice.entity.CarrierCompany;
 import com.memilogistics.shipmentservice.entity.Shipment;
 import com.memilogistics.shipmentservice.entity.ShipmentOffer;
-import com.memilogistics.shipmentservice.entity.ShipperProfile;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -19,7 +14,6 @@ import java.util.stream.Collectors;
 @Component
 @RequiredArgsConstructor
 public class ShipmentMapper {
-    private final ProfileMapper profileMapper;
 
     public ShipmentResponse toResponse(Shipment shipment) {
         if (shipment == null) {
