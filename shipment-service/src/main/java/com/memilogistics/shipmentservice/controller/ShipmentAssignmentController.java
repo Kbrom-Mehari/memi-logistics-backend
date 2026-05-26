@@ -9,6 +9,8 @@ import com.memilogistics.shipmentservice.service.ShipmentAssignmentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
@@ -21,7 +23,7 @@ public class ShipmentAssignmentController {
 
 
     @PostMapping("/{shipmentId}/offer-shipment")
-    @PreAuthorize("hasRole('CARRIER') or hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ROLE_CARRIER') or hasAuthority('ROLE_ADMIN')")
     public ResponseEntity<Void> offerShipment(@PathVariable("shipmentId") Long shipmentId,
                                               @RequestParam("price") BigDecimal price,
                                               @CurrentUser CustomUserPrincipal user

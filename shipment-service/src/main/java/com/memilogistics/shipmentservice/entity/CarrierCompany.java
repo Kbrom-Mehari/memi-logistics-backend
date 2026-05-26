@@ -16,8 +16,6 @@ public class CarrierCompany {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    private String managerUserId;
-
     private String companyName;
 
     @OneToOne(fetch = FetchType.LAZY, orphanRemoval = true)

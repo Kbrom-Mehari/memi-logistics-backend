@@ -41,7 +41,10 @@ public class PasswordResetService {
         }
 
         User user = userOptional.get();
-        passwordResetTokenRepository.deleteByUserId(user.getId());
+        if (user.getPasswordResetToken() != null) {
+            passwordResetTokenRepository.delete(user.getPasswordResetToken());
+            passwordResetTokenRepository.flush();
+        }
 
         LocalDateTime expiry = LocalDateTime.now().plus(resetTokenExpirationMs, ChronoUnit.MILLIS);
         PasswordResetToken token = new PasswordResetToken(user, expiry);

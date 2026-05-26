@@ -17,7 +17,7 @@ import java.util.Map;
 import java.util.function.Function;
 
 @Service
-public class JwtService {
+public class  JwtService {
 	private final String jwtSecret;
 	private final long jwtExpirationMs;
 

@@ -86,7 +86,6 @@ class PasswordResetServiceTest {
 
         passwordResetService.requestReset(request);
 
-        verify(passwordResetTokenRepository).deleteByUserId(user.getId());
         ArgumentCaptor<PasswordResetToken> tokenCaptor = ArgumentCaptor.forClass(PasswordResetToken.class);
         verify(passwordResetTokenRepository).save(tokenCaptor.capture());
 
