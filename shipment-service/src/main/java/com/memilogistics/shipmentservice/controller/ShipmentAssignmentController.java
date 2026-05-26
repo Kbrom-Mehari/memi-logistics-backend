@@ -23,7 +23,7 @@ public class ShipmentAssignmentController {
 
 
     @PostMapping("/{shipmentId}/offer-shipment")
-    @PreAuthorize("hasAuthority('ROLE_CARRIER') or hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_CARRIER') or hasRole('ROLE_ADMIN')")
     public ResponseEntity<Void> offerShipment(@PathVariable("shipmentId") Long shipmentId,
                                               @RequestParam("price") BigDecimal price,
                                               @CurrentUser CustomUserPrincipal user

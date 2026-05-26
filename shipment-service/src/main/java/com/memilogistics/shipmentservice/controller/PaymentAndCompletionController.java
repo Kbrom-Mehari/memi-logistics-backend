@@ -10,7 +10,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/shipments")
+@RequestMapping("/api/payment")
 @RequiredArgsConstructor
 public class PaymentAndCompletionController {
     private final PaymentRecordService paymentRecordService;

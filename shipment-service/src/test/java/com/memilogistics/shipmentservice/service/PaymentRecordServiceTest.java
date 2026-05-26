@@ -20,6 +20,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Currency;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -64,6 +65,7 @@ public class PaymentRecordServiceTest {
         paymentRequest.setAmount(new BigDecimal("250.00"));
         paymentRequest.setPaymentMethod(PaymentMethod.BANK_TRANSFER);
         paymentRequest.setNote("Payment for delivery");
+        paymentRequest.setCurrencyCode("USD");
 
         samplePaymentRecord = new PaymentRecord();
         samplePaymentRecord.setId(100L);
@@ -80,6 +82,7 @@ public class PaymentRecordServiceTest {
         assertNotNull(sampleShipment.getPaymentRecord());
         assertTrue(sampleShipment.getPaymentRecord().isShipperConfirmed());
         assertEquals(new BigDecimal("250.00"), sampleShipment.getPaymentRecord().getAmount());
+        assertEquals(Currency.getInstance("USD"), sampleShipment.getPaymentRecord().getCurrency());
         assertFalse(sampleShipment.getShipmentEvents().isEmpty());
         // Since @Transactional manages saving implicitly via dirty checking, we don't strictly assert save()
     }

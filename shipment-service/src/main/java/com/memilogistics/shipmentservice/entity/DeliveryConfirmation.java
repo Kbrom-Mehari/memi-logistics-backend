@@ -25,7 +25,7 @@ public class DeliveryConfirmation {
     @Column(nullable = false)
     private LocalDateTime carrierConfirmedAt;
 
-    @Column(nullable = false)
+    @Column()
     private LocalDateTime shipperConfirmedAt;
 
     private String note;

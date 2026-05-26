@@ -25,7 +25,7 @@ import java.net.URI;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/shipments")
+@RequestMapping("/api/shipment")
 @RequiredArgsConstructor
 public class ShipmentController {
     private final ShipmentService shipmentService;
@@ -63,7 +63,7 @@ public class ShipmentController {
 
     }
 
-    @GetMapping("/tracking/{trackingNumber}")
+    @GetMapping("/{trackingNumber}")
     public ResponseEntity<ShipmentResponse> getShipmentByTrackingNumber(@PathVariable("trackingNumber") String trackingNumber) {
         try {
             var shipment = shipmentService.getShipmentByTrackingNumber(trackingNumber);

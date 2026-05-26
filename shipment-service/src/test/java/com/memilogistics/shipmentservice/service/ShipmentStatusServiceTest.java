@@ -1,11 +1,13 @@
 package com.memilogistics.shipmentservice.service;
 
 import com.memilogistics.commonsecurity.principal.CustomUserPrincipal;
+import com.memilogistics.shipmentservice.dto.ShipmentResponse;
 import com.memilogistics.shipmentservice.dto.StatusUpdateRequest;
 import com.memilogistics.shipmentservice.entity.CarrierCompany;
 import com.memilogistics.shipmentservice.entity.Shipment;
 import com.memilogistics.shipmentservice.enums.ShipmentStatus;
 import com.memilogistics.shipmentservice.exception.InvalidShipmentStatusTransitionException;
+import com.memilogistics.shipmentservice.mapper.ShipmentMapper;
 import com.memilogistics.shipmentservice.repository.CarrierCompanyRepository;
 import com.memilogistics.shipmentservice.repository.ShipmentRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -32,6 +34,9 @@ public class ShipmentStatusServiceTest {
 
     @Mock
     private CarrierCompanyRepository carrierCompanyRepository;
+
+    @Mock
+    private ShipmentMapper shipmentMapper;
 
     @InjectMocks
     private ShipmentStatusService shipmentStatusService;
@@ -61,17 +66,23 @@ public class ShipmentStatusServiceTest {
 
     @Test
     void updateShipmentStatus_ShouldUpdateStatus_WhenValid() {
+        ShipmentResponse response = new ShipmentResponse();
+        response.setId(sampleShipment.getId());
+        response.setStatus(ShipmentStatus.PICKED_UP);
+
         when(carrierCompanyRepository.findByAuthenticationEmail(sampleUser.getUsername()))
                 .thenReturn(Optional.of(sampleCarrier));
         when(shipmentRepository.findById(1L)).thenReturn(Optional.of(sampleShipment));
         when(shipmentRepository.save(any(Shipment.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(shipmentMapper.toResponse(sampleShipment)).thenReturn(response);
 
-        Shipment updatedShipment = shipmentStatusService.updateShipmentStatus(1L, updateRequest, sampleUser);
+        ShipmentResponse updatedShipment = shipmentStatusService.updateShipmentStatus(1L, updateRequest, sampleUser);
 
         assertNotNull(updatedShipment);
         assertEquals(ShipmentStatus.PICKED_UP, updatedShipment.getStatus());
-        assertFalse(updatedShipment.getShipmentEvents().isEmpty());
+        assertFalse(sampleShipment.getShipmentEvents().isEmpty());
         verify(shipmentRepository).save(sampleShipment);
+        verify(shipmentMapper).toResponse(sampleShipment);
     }
 
     @Test
@@ -160,6 +171,10 @@ public class ShipmentStatusServiceTest {
 
     @Test
     void updateShipmentStatus_ShouldAddDeliveryConfirmation_WhenDelivered() {
+        ShipmentResponse response = new ShipmentResponse();
+        response.setId(sampleShipment.getId());
+        response.setStatus(ShipmentStatus.DELIVERED);
+
         sampleShipment.setStatus(ShipmentStatus.ARRIVED_AT_DESTINATION);
         updateRequest.setStatus(ShipmentStatus.DELIVERED);
 
@@ -167,11 +182,13 @@ public class ShipmentStatusServiceTest {
                 .thenReturn(Optional.of(sampleCarrier));
         when(shipmentRepository.findById(1L)).thenReturn(Optional.of(sampleShipment));
         when(shipmentRepository.save(any(Shipment.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(shipmentMapper.toResponse(sampleShipment)).thenReturn(response);
 
-        Shipment updatedShipment = shipmentStatusService.updateShipmentStatus(1L, updateRequest, sampleUser);
+        ShipmentResponse updatedShipment = shipmentStatusService.updateShipmentStatus(1L, updateRequest, sampleUser);
 
         assertEquals(ShipmentStatus.DELIVERED, updatedShipment.getStatus());
-        assertNotNull(updatedShipment.getDeliveryConfirmation());
+        assertNotNull(sampleShipment.getDeliveryConfirmation());
         verify(shipmentRepository).save(sampleShipment);
+        verify(shipmentMapper).toResponse(sampleShipment);
     }
 }

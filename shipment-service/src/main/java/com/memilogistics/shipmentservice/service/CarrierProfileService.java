@@ -4,11 +4,13 @@ import com.memilogistics.commonsecurity.annotation.CurrentUser;
 import com.memilogistics.commonsecurity.principal.CustomUserPrincipal;
 import com.memilogistics.shipmentservice.dto.CarrierCompanyResponse;
 import com.memilogistics.shipmentservice.dto.CreateCarrierProfileRequest;
+import com.memilogistics.shipmentservice.dto.ShipmentResponse;
 import com.memilogistics.shipmentservice.dto.UpdateCarrierProfileRequest;
 import com.memilogistics.shipmentservice.entity.Address;
 import com.memilogistics.shipmentservice.entity.CarrierCompany;
 import com.memilogistics.shipmentservice.entity.ShipperProfile;
 import com.memilogistics.shipmentservice.mapper.ProfileMapper;
+import com.memilogistics.shipmentservice.mapper.ShipmentMapper;
 import com.memilogistics.shipmentservice.repository.AddressRepository;
 import com.memilogistics.shipmentservice.repository.CarrierCompanyRepository;
 import lombok.RequiredArgsConstructor;
@@ -17,12 +19,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class CarrierProfileService {
     private final CarrierCompanyRepository carrierCompanyRepository;
     private final AddressRepository addressRepository;
     private final ProfileMapper profileMapper;
+    private final ShipmentMapper shipmentMapper;
 
     @Transactional
     public CarrierCompanyResponse createCarrierCompanyProfile(@CurrentUser CustomUserPrincipal user,
@@ -98,6 +103,24 @@ public class CarrierProfileService {
                 ()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "Carrier company not found with id: " + carrierCompanyId)
         );
         return profileMapper.toCarrierCompanyResponse(company);
+    }
+
+    public List<ShipmentResponse> getAssignedShipments(
+            @CurrentUser CustomUserPrincipal user
+    ) {
+        var carrier = carrierCompanyRepository.findByAuthenticationEmail(user.getUsername()).orElseThrow(
+                ()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "Carrier company not found")
+        );
+        var shipments = carrier.getAssignedShipments();
+        return shipmentMapper.toResponseList(shipments);
+    }
+
+    public List<ShipmentResponse> getAssignedShipments(Long carrierId){
+        var carrier = carrierCompanyRepository.findById(carrierId).orElseThrow(
+                ()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "Carrier company not found")
+        );
+        var shipments = carrier.getAssignedShipments();
+        return shipmentMapper.toResponseList(shipments);
     }
 
 
