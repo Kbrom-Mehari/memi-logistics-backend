@@ -55,7 +55,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         //Convert roles to Spring Security authorities.
         List<SimpleGrantedAuthority> authorities = claims.getRoles().stream()
-                .map(role -> new SimpleGrantedAuthority("ROLE_" + role))
+                .map(role -> {
+                    String authority = role.startsWith("ROLE_") ? role : "ROLE_" + role;
+                    return new SimpleGrantedAuthority(authority);
+                })
                 .toList();
 
         //Create authentication object with principal and authorities.
