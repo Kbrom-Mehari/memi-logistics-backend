@@ -9,6 +9,7 @@ import com.memilogistics.shipmentservice.entity.Shipment;
 import com.memilogistics.shipmentservice.entity.ShipmentEvent;
 import com.memilogistics.shipmentservice.enums.ShipmentStatus;
 import com.memilogistics.shipmentservice.repository.CarrierCompanyRepository;
+import com.memilogistics.shipmentservice.repository.PaymentRecordRepository;
 import com.memilogistics.shipmentservice.repository.ShipmentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -25,6 +26,7 @@ import java.util.Currency;
 public class PaymentRecordService {
     private final ShipmentRepository shipmentRepository;
     private final CarrierCompanyRepository carrierCompanyRepository;
+    private final PaymentRecordRepository paymentRecordRepository;
 
 
     @Transactional
@@ -67,6 +69,7 @@ public class PaymentRecordService {
 
         paymentRecord.setNote(request.getNote());
         paymentRecord.setCurrency(Currency.getInstance(request.getCurrencyCode()));
+        paymentRecord.setShipment(shipment);
 
         shipment.setPaymentRecord(paymentRecord);
 
@@ -74,6 +77,7 @@ public class PaymentRecordService {
         shipmentEvent.setEventTimestamp(LocalDateTime.now());
         shipmentEvent.setDescription("Payment initiated");
         shipmentEvent.setLocation(shipment.getDestination());
+        shipmentEvent.setShipmentStatus(ShipmentStatus.PAYMENT_PENDING);
 
         shipment.addShipmentEvent(shipmentEvent);
     }
@@ -106,8 +110,10 @@ public class PaymentRecordService {
         paymentRecord.setCarrierConfirmedAt(LocalDateTime.now());
         shipment.setStatus(ShipmentStatus.COMPLETED);
         shipment.setCompletedAt(LocalDateTime.now());
+        paymentRecord.setShipment(shipment);
 
         ShipmentEvent shipmentEvent = createCompletionEvent(shipment.getDestination());
+        shipmentEvent.setShipment(shipment);
 
         shipment.addShipmentEvent(shipmentEvent);
     }

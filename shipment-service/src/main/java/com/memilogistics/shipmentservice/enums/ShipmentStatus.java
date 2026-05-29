@@ -8,6 +8,7 @@ public enum ShipmentStatus {
     IN_TRANSIT,
     ARRIVED_AT_DESTINATION,
     DELIVERED,
+    PAYMENT_PENDING,
     COMPLETED;
 
     public boolean canTransitionTo(ShipmentStatus nextStatus) {
@@ -21,7 +22,8 @@ public enum ShipmentStatus {
             case PICKED_UP -> nextStatus == IN_TRANSIT;
             case IN_TRANSIT -> nextStatus == ARRIVED_AT_DESTINATION;
             case ARRIVED_AT_DESTINATION -> nextStatus == DELIVERED;
-            case DELIVERED -> nextStatus == COMPLETED;
+            case DELIVERED -> nextStatus == PAYMENT_PENDING;
+            case PAYMENT_PENDING -> nextStatus == COMPLETED;
             case COMPLETED -> false;
         };
     }

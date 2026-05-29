@@ -187,7 +187,7 @@ public class ShipmentService {
     public DashboardInformation getDashboardInformation() {
         return new DashboardInformation(
                 shipmentRepository.countByStatus(ShipmentStatus.PENDING),
-                shipmentRepository.countByStatus(ShipmentStatus.DELIVERED),
+                shipmentRepository.countByStatus(ShipmentStatus.COMPLETED),
                 shipmentRepository.countByFragile(true),
                 shipmentRepository.countByFragile(false)
                 );

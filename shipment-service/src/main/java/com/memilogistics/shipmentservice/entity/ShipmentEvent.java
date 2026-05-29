@@ -15,9 +15,14 @@ public class ShipmentEvent {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
+
     private String description;
+
+//    @Enumerated(EnumType.STRING)
     private ShipmentStatus shipmentStatus;
+
     private String location;
+
     private LocalDateTime eventTimestamp;
 
     @ManyToOne(optional = false)

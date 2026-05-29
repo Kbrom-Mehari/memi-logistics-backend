@@ -12,7 +12,7 @@ import java.util.Currency;
 @Entity
 @Getter
 @Setter
-public class PaymentRecord {
+public class  PaymentRecord {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;

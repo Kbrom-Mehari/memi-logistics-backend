@@ -63,7 +63,7 @@ public class ShipmentController {
 
     }
 
-    @GetMapping("/{trackingNumber}")
+    @GetMapping("/{trackingNumber}/track")
     public ResponseEntity<ShipmentResponse> getShipmentByTrackingNumber(@PathVariable("trackingNumber") String trackingNumber) {
         try {
             var shipment = shipmentService.getShipmentByTrackingNumber(trackingNumber);
