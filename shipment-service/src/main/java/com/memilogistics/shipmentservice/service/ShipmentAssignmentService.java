@@ -48,9 +48,6 @@ public class ShipmentAssignmentService {
 
         shipment.getShipmentOffers().add(shipmentOffer);
         shipment.setStatus(ShipmentStatus.ACCEPTED);
-
-//        shipmentRepository.save(shipment);
-//        shipmentOfferRepository.save(shipmentOffer);
     }
 
     @Transactional
