@@ -72,6 +72,7 @@ public class PaymentRecordService {
         paymentRecord.setShipment(shipment);
 
         shipment.setPaymentRecord(paymentRecord);
+        shipment.setStatus(ShipmentStatus.PAYMENT_PENDING);
 
         ShipmentEvent shipmentEvent = new ShipmentEvent();
         shipmentEvent.setEventTimestamp(LocalDateTime.now());
