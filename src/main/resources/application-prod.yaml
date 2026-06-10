@@ -18,5 +18,8 @@ application:
       secret-key: ${JWT_SECRET}
       expiration: 900000 # 15 minutes for security in prod
     refresh-token-expiration: 604800000 # 7 days
+    initial-admin:
+      email: ${INITIAL_ADMIN_EMAIL:halefomhailu@memitrading.com}
+      password: ${INITIAL_ADMIN_PASSWORD:Admin@123}
 server:
   port: ${PORT:8080}
