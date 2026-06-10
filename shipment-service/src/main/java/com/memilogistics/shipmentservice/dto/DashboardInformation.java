@@ -12,4 +12,8 @@ public class DashboardInformation {
     private Long completedShipments;
     private Long fragileShipments;
     private Long nonFragileShipments;
+    private Long numberOfShippers;
+    private Long numberOfCarriers;
+    private Long totalUsers;
+    private Long totalShipments;
 }
