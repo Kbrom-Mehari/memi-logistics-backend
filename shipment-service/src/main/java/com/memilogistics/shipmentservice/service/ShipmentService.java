@@ -8,6 +8,7 @@ import com.memilogistics.shipmentservice.entity.ShipmentEvent;
 import com.memilogistics.shipmentservice.entity.ShipmentOffer;
 import com.memilogistics.shipmentservice.entity.ShipperProfile;
 import com.memilogistics.shipmentservice.enums.ShipmentStatus;
+import com.memilogistics.shipmentservice.repository.CarrierCompanyRepository;
 import com.memilogistics.shipmentservice.repository.ShipmentRepository;
 import com.memilogistics.shipmentservice.repository.ShipperProfileRepository;
 import com.memilogistics.shipmentservice.mapper.ShipmentMapper;
@@ -29,6 +30,7 @@ import java.util.UUID;
 public class ShipmentService {
     private final ShipmentRepository shipmentRepository;
     private final ShipperProfileRepository shipperProfileRepository;
+    private final CarrierCompanyRepository carrierCompanyRepository;
     private final ShipmentMapper shipmentMapper;
 
     public CreateShipmentResponse createShipment(@CurrentUser CustomUserPrincipal user, CreateShipmentRequest request) {
@@ -189,7 +191,11 @@ public class ShipmentService {
                 shipmentRepository.countByStatus(ShipmentStatus.PENDING),
                 shipmentRepository.countByStatus(ShipmentStatus.COMPLETED),
                 shipmentRepository.countByFragile(true),
-                shipmentRepository.countByFragile(false)
+                shipmentRepository.countByFragile(false),
+                shipperProfileRepository.count(),
+                carrierCompanyRepository.count(),
+                carrierCompanyRepository.count() + shipperProfileRepository.count(),
+                shipmentRepository.count()
                 );
     }
 
