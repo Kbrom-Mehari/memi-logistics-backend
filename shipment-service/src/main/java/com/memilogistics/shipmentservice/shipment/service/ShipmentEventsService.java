@@ -1,9 +1,9 @@
-package com.memilogistics.shipmentservice.service;
+package com.memilogistics.shipmentservice.shipment.service;
 
-import com.memilogistics.shipmentservice.dto.ShipmentEventResponse;
-import com.memilogistics.shipmentservice.entity.Shipment;
-import com.memilogistics.shipmentservice.mapper.ShipmentEventMapper;
-import com.memilogistics.shipmentservice.repository.ShipmentRepository;
+import com.memilogistics.shipmentservice.shipment.dto.ShipmentEventResponse;
+import com.memilogistics.shipmentservice.shipment.entity.Shipment;
+import com.memilogistics.shipmentservice.shipment.mapper.ShipmentEventMapper;
+import com.memilogistics.shipmentservice.shipment.repository.ShipmentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

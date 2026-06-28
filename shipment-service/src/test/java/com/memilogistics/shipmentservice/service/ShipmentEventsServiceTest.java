@@ -1,10 +1,11 @@
 package com.memilogistics.shipmentservice.service;
 
-import com.memilogistics.shipmentservice.dto.ShipmentEventResponse;
-import com.memilogistics.shipmentservice.entity.Shipment;
-import com.memilogistics.shipmentservice.entity.ShipmentEvent;
-import com.memilogistics.shipmentservice.mapper.ShipmentEventMapper;
-import com.memilogistics.shipmentservice.repository.ShipmentRepository;
+import com.memilogistics.shipmentservice.shipment.dto.ShipmentEventResponse;
+import com.memilogistics.shipmentservice.shipment.entity.Shipment;
+import com.memilogistics.shipmentservice.shipment.entity.ShipmentEvent;
+import com.memilogistics.shipmentservice.shipment.mapper.ShipmentEventMapper;
+import com.memilogistics.shipmentservice.shipment.repository.ShipmentRepository;
+import com.memilogistics.shipmentservice.shipment.service.ShipmentEventsService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

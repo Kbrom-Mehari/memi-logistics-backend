@@ -1,8 +1,8 @@
-package com.memilogistics.shipmentservice.service;
+package com.memilogistics.shipmentservice.shipment.service;
 
 import com.memilogistics.shipmentservice.shipment.entity.ShipmentEvent;
 import com.memilogistics.shipmentservice.shipment.enums.ShipmentStatus;
-import com.memilogistics.shipmentservice.repository.DeliveryConfirmationRepository;
+import com.memilogistics.shipmentservice.shipment.repository.DeliveryConfirmationRepository;
 import com.memilogistics.shipmentservice.shipment.repository.ShipmentRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;

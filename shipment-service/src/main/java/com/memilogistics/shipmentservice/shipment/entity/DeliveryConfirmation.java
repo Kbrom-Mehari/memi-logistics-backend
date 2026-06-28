@@ -1,6 +1,5 @@
-package com.memilogistics.shipmentservice.entity;
+package com.memilogistics.shipmentservice.shipment.entity;
 
-import com.memilogistics.shipmentservice.shipment.entity.Shipment;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;

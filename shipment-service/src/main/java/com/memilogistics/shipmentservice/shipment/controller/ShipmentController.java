@@ -1,11 +1,12 @@
-package com.memilogistics.shipmentservice.controller;
+package com.memilogistics.shipmentservice.shipment.controller;
 
 import com.memilogistics.commonsecurity.annotation.CurrentUser;
 import com.memilogistics.commonsecurity.principal.CustomUserPrincipal;
-import com.memilogistics.shipmentservice.dto.*;
-import com.memilogistics.shipmentservice.mapper.ShipmentMapper;
-import com.memilogistics.shipmentservice.service.ShipmentService;
-import com.memilogistics.shipmentservice.enums.ShipmentStatus;
+import com.memilogistics.shipmentservice.dashboard.DashboardInformation;
+import com.memilogistics.shipmentservice.shipment.dto.*;
+import com.memilogistics.shipmentservice.shipment.mapper.ShipmentMapper;
+import com.memilogistics.shipmentservice.shipment.service.ShipmentService;
+import com.memilogistics.shipmentservice.shipment.enums.ShipmentStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;

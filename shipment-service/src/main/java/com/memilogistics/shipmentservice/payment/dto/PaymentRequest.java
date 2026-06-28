@@ -1,11 +1,10 @@
-package com.memilogistics.shipmentservice.dto;
+package com.memilogistics.shipmentservice.payment.dto;
 
-import com.memilogistics.shipmentservice.enums.PaymentMethod;
+import com.memilogistics.shipmentservice.payment.enums.PaymentMethod;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigDecimal;
-import java.util.Currency;
 
 @Getter
 @Setter

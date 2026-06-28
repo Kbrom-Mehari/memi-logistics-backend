@@ -1,4 +1,4 @@
-package com.memilogistics.shipmentservice.entity;
+package com.memilogistics.shipmentservice.shipment.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.memilogistics.shipmentservice.carriercompany.entity.CarrierCompany;

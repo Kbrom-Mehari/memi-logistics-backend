@@ -1,4 +1,4 @@
-package com.memilogistics.shipmentservice.enums;
+package com.memilogistics.shipmentservice.shipment.enums;
 
 public enum ShipmentStatus {
     PENDING,

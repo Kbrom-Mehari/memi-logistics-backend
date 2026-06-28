@@ -1,4 +1,4 @@
-package com.memilogistics.shipmentservice.repository;
+package com.memilogistics.shipmentservice.address.repository;
 
 import com.memilogistics.shipmentservice.address.entity.Address;
 import org.springframework.data.jpa.repository.JpaRepository;

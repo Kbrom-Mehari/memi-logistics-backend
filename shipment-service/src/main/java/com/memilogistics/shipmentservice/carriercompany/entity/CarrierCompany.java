@@ -1,6 +1,8 @@
-package com.memilogistics.shipmentservice.entity;
+package com.memilogistics.shipmentservice.carriercompany.entity;
 
 import com.memilogistics.shipmentservice.address.entity.Address;
+import com.memilogistics.shipmentservice.shipment.entity.Shipment;
+import com.memilogistics.shipmentservice.shipment.entity.ShipmentOffer;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import lombok.Getter;

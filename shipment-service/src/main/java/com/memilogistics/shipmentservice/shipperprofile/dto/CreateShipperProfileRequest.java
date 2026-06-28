@@ -1,4 +1,4 @@
-package com.memilogistics.shipmentservice.dto;
+package com.memilogistics.shipmentservice.shipperprofile.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;

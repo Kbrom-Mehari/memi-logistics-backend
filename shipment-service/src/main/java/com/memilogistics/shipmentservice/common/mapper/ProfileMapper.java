@@ -1,4 +1,4 @@
-package com.memilogistics.shipmentservice.mapper;
+package com.memilogistics.shipmentservice.common.mapper;
 
 import com.memilogistics.shipmentservice.carriercompany.dto.CarrierCompanyResponse;
 import com.memilogistics.shipmentservice.shipperprofile.dto.ShipperProfileResponse;

@@ -1,17 +1,17 @@
-package com.memilogistics.shipmentservice.service;
+package com.memilogistics.shipmentservice.carriercompany.service;
 
 import com.memilogistics.commonsecurity.annotation.CurrentUser;
 import com.memilogistics.commonsecurity.principal.CustomUserPrincipal;
-import com.memilogistics.shipmentservice.dto.CarrierCompanyResponse;
-import com.memilogistics.shipmentservice.dto.CreateCarrierProfileRequest;
-import com.memilogistics.shipmentservice.dto.ShipmentResponse;
-import com.memilogistics.shipmentservice.dto.UpdateCarrierProfileRequest;
+import com.memilogistics.shipmentservice.carriercompany.dto.CarrierCompanyResponse;
+import com.memilogistics.shipmentservice.carriercompany.dto.CreateCarrierProfileRequest;
+import com.memilogistics.shipmentservice.shipment.dto.ShipmentResponse;
+import com.memilogistics.shipmentservice.carriercompany.dto.UpdateCarrierProfileRequest;
 import com.memilogistics.shipmentservice.address.entity.Address;
-import com.memilogistics.shipmentservice.entity.CarrierCompany;
-import com.memilogistics.shipmentservice.mapper.ProfileMapper;
-import com.memilogistics.shipmentservice.mapper.ShipmentMapper;
-import com.memilogistics.shipmentservice.repository.AddressRepository;
-import com.memilogistics.shipmentservice.repository.CarrierCompanyRepository;
+import com.memilogistics.shipmentservice.carriercompany.entity.CarrierCompany;
+import com.memilogistics.shipmentservice.common.mapper.ProfileMapper;
+import com.memilogistics.shipmentservice.shipment.mapper.ShipmentMapper;
+import com.memilogistics.shipmentservice.address.repository.AddressRepository;
+import com.memilogistics.shipmentservice.carriercompany.repository.CarrierCompanyRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;

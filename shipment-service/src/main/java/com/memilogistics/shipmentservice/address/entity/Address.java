@@ -1,4 +1,4 @@
-package com.memilogistics.shipmentservice.entity;
+package com.memilogistics.shipmentservice.address.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;

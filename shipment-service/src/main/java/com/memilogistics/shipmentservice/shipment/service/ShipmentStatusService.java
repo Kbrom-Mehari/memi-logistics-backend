@@ -1,18 +1,18 @@
-package com.memilogistics.shipmentservice.service;
+package com.memilogistics.shipmentservice.shipment.service;
 
 import com.memilogistics.commonsecurity.annotation.CurrentUser;
 import com.memilogistics.commonsecurity.principal.CustomUserPrincipal;
-import com.memilogistics.shipmentservice.dto.ShipmentResponse;
-import com.memilogistics.shipmentservice.dto.StatusUpdateRequest;
+import com.memilogistics.shipmentservice.shipment.dto.ShipmentResponse;
+import com.memilogistics.shipmentservice.shipment.dto.StatusUpdateRequest;
 import com.memilogistics.shipmentservice.carriercompany.entity.CarrierCompany;
-import com.memilogistics.shipmentservice.entity.DeliveryConfirmation;
-import com.memilogistics.shipmentservice.entity.Shipment;
-import com.memilogistics.shipmentservice.entity.ShipmentEvent;
-import com.memilogistics.shipmentservice.enums.ShipmentStatus;
+import com.memilogistics.shipmentservice.shipment.entity.DeliveryConfirmation;
+import com.memilogistics.shipmentservice.shipment.entity.Shipment;
+import com.memilogistics.shipmentservice.shipment.entity.ShipmentEvent;
+import com.memilogistics.shipmentservice.shipment.enums.ShipmentStatus;
 import com.memilogistics.shipmentservice.exception.InvalidShipmentStatusTransitionException;
-import com.memilogistics.shipmentservice.mapper.ShipmentMapper;
+import com.memilogistics.shipmentservice.shipment.mapper.ShipmentMapper;
 import com.memilogistics.shipmentservice.carriercompany.repository.CarrierCompanyRepository;
-import com.memilogistics.shipmentservice.repository.ShipmentRepository;
+import com.memilogistics.shipmentservice.shipment.repository.ShipmentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;

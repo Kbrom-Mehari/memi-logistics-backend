@@ -1,4 +1,4 @@
-package com.memilogistics.shipmentservice.service;
+package com.memilogistics.shipmentservice.payment.service;
 
 import com.memilogistics.commonsecurity.annotation.CurrentUser;
 import com.memilogistics.commonsecurity.principal.CustomUserPrincipal;
@@ -9,7 +9,7 @@ import com.memilogistics.shipmentservice.shipment.entity.Shipment;
 import com.memilogistics.shipmentservice.shipment.entity.ShipmentEvent;
 import com.memilogistics.shipmentservice.shipment.enums.ShipmentStatus;
 import com.memilogistics.shipmentservice.carriercompany.repository.CarrierCompanyRepository;
-import com.memilogistics.shipmentservice.repository.PaymentRecordRepository;
+import com.memilogistics.shipmentservice.payment.repository.PaymentRecordRepository;
 import com.memilogistics.shipmentservice.shipment.repository.ShipmentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

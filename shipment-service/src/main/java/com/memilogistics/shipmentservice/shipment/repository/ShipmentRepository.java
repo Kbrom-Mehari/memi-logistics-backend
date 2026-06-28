@@ -1,7 +1,7 @@
-package com.memilogistics.shipmentservice.repository;
+package com.memilogistics.shipmentservice.shipment.repository;
 
-import com.memilogistics.shipmentservice.entity.Shipment;
-import com.memilogistics.shipmentservice.enums.ShipmentStatus;
+import com.memilogistics.shipmentservice.shipment.entity.Shipment;
+import com.memilogistics.shipmentservice.shipment.enums.ShipmentStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

@@ -1,12 +1,13 @@
-package com.memilogistics.shipmentservice.shipperprofile;
+package com.memilogistics.shipmentservice.shipperprofile.service;
 
 import com.memilogistics.commonsecurity.annotation.CurrentUser;
 import com.memilogistics.commonsecurity.principal.CustomUserPrincipal;
-import com.memilogistics.shipmentservice.dto.CreateShipperProfileRequest;
+import com.memilogistics.shipmentservice.shipperprofile.dto.CreateShipperProfileRequest;
 import com.memilogistics.shipmentservice.address.entity.Address;
-import com.memilogistics.shipmentservice.entity.ShipperProfile;
+import com.memilogistics.shipmentservice.shipperprofile.entity.ShipperProfile;
 import com.memilogistics.shipmentservice.address.repository.AddressRepository;
-import com.memilogistics.shipmentservice.mapper.ProfileMapper;
+import com.memilogistics.shipmentservice.common.mapper.ProfileMapper;
+import com.memilogistics.shipmentservice.shipperprofile.dto.UpdateShipperProfileRequest;
 import com.memilogistics.shipmentservice.shipperprofile.dto.ShipperProfileResponse;
 import com.memilogistics.shipmentservice.shipperprofile.repository.ShipperProfileRepository;
 import lombok.RequiredArgsConstructor;

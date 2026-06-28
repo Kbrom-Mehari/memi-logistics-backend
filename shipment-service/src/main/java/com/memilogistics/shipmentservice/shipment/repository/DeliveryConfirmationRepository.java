@@ -1,4 +1,4 @@
-package com.memilogistics.shipmentservice.repository;
+package com.memilogistics.shipmentservice.shipment.repository;
 
 import com.memilogistics.shipmentservice.shipment.entity.DeliveryConfirmation;
 import org.springframework.data.jpa.repository.JpaRepository;

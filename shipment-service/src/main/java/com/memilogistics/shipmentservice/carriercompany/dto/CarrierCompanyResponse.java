@@ -1,4 +1,4 @@
-package com.memilogistics.shipmentservice.dto;
+package com.memilogistics.shipmentservice.carriercompany.dto;
 
 import lombok.Data;
 

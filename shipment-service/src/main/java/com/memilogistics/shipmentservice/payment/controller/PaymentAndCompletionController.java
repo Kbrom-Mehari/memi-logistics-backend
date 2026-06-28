@@ -1,9 +1,9 @@
-package com.memilogistics.shipmentservice.controller;
+package com.memilogistics.shipmentservice.payment.controller;
 
 import com.memilogistics.commonsecurity.annotation.CurrentUser;
 import com.memilogistics.commonsecurity.principal.CustomUserPrincipal;
-import com.memilogistics.shipmentservice.dto.PaymentRequest;
-import com.memilogistics.shipmentservice.service.PaymentRecordService;
+import com.memilogistics.shipmentservice.payment.dto.PaymentRequest;
+import com.memilogistics.shipmentservice.payment.service.PaymentRecordService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;

@@ -1,7 +1,7 @@
-package com.memilogistics.shipmentservice.mapper;
+package com.memilogistics.shipmentservice.shipment.mapper;
 
-import com.memilogistics.shipmentservice.dto.ShipmentEventResponse;
-import com.memilogistics.shipmentservice.entity.ShipmentEvent;
+import com.memilogistics.shipmentservice.shipment.dto.ShipmentEventResponse;
+import com.memilogistics.shipmentservice.shipment.entity.ShipmentEvent;
 import org.springframework.stereotype.Component;
 
 import java.util.List;

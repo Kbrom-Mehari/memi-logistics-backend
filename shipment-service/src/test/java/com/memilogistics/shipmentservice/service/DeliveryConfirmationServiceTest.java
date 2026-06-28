@@ -1,11 +1,12 @@
 package com.memilogistics.shipmentservice.service;
 
-import com.memilogistics.shipmentservice.entity.DeliveryConfirmation;
-import com.memilogistics.shipmentservice.entity.Shipment;
-import com.memilogistics.shipmentservice.entity.ShipperProfile;
-import com.memilogistics.shipmentservice.enums.ShipmentStatus;
-import com.memilogistics.shipmentservice.repository.DeliveryConfirmationRepository;
-import com.memilogistics.shipmentservice.repository.ShipmentRepository;
+import com.memilogistics.shipmentservice.shipment.entity.DeliveryConfirmation;
+import com.memilogistics.shipmentservice.shipment.entity.Shipment;
+import com.memilogistics.shipmentservice.shipment.service.DeliveryConfirmationService;
+import com.memilogistics.shipmentservice.shipperprofile.entity.ShipperProfile;
+import com.memilogistics.shipmentservice.shipment.enums.ShipmentStatus;
+import com.memilogistics.shipmentservice.shipment.repository.DeliveryConfirmationRepository;
+import com.memilogistics.shipmentservice.shipment.repository.ShipmentRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

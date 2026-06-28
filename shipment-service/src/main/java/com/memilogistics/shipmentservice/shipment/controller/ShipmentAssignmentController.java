@@ -1,16 +1,11 @@
-package com.memilogistics.shipmentservice.controller;
+package com.memilogistics.shipmentservice.shipment.controller;
 
 import com.memilogistics.commonsecurity.annotation.CurrentUser;
 import com.memilogistics.commonsecurity.principal.CustomUserPrincipal;
-import com.memilogistics.shipmentservice.dto.AssignCarrierRequest;
-import com.memilogistics.shipmentservice.dto.CancelShipmentOfferRequest;
-import com.memilogistics.shipmentservice.dto.ShipmentOfferRequest;
-import com.memilogistics.shipmentservice.service.ShipmentAssignmentService;
+import com.memilogistics.shipmentservice.shipment.service.ShipmentAssignmentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;

@@ -1,6 +1,6 @@
 package com.memilogistics.shipmentservice.exception;
 
-import com.memilogistics.shipmentservice.enums.ShipmentStatus;
+import com.memilogistics.shipmentservice.shipment.enums.ShipmentStatus;
 
 public class InvalidShipmentStatusTransitionException extends RuntimeException {
     public InvalidShipmentStatusTransitionException(ShipmentStatus current,

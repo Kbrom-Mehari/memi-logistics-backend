@@ -1,10 +1,10 @@
-package com.memilogistics.shipmentservice.controller;
+package com.memilogistics.shipmentservice.shipperprofile.controller;
 
 import com.memilogistics.commonsecurity.annotation.CurrentUser;
 import com.memilogistics.commonsecurity.principal.CustomUserPrincipal;
-import com.memilogistics.shipmentservice.dto.CreateShipperProfileRequest;
+import com.memilogistics.shipmentservice.shipperprofile.dto.CreateShipperProfileRequest;
 import com.memilogistics.shipmentservice.shipperprofile.dto.ShipperProfileResponse;
-import com.memilogistics.shipmentservice.shipperprofile.UpdateShipperProfileRequest;
+import com.memilogistics.shipmentservice.shipperprofile.dto.UpdateShipperProfileRequest;
 import com.memilogistics.shipmentservice.shipperprofile.service.ShipperProfileService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

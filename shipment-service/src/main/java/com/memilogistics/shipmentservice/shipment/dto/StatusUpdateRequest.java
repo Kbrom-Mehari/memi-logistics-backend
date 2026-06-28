@@ -1,6 +1,6 @@
-package com.memilogistics.shipmentservice.dto;
+package com.memilogistics.shipmentservice.shipment.dto;
 
-import com.memilogistics.shipmentservice.enums.ShipmentStatus;
+import com.memilogistics.shipmentservice.shipment.enums.ShipmentStatus;
 import lombok.Getter;
 import lombok.Setter;
 

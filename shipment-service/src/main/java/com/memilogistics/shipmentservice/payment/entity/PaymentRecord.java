@@ -1,6 +1,6 @@
-package com.memilogistics.shipmentservice.entity;
+package com.memilogistics.shipmentservice.payment.entity;
 
-import com.memilogistics.shipmentservice.enums.PaymentMethod;
+import com.memilogistics.shipmentservice.payment.enums.PaymentMethod;
 import com.memilogistics.shipmentservice.shipment.entity.Shipment;
 import jakarta.persistence.*;
 import lombok.Getter;

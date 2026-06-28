@@ -1,7 +1,7 @@
-package com.memilogistics.shipmentservice.controller;
+package com.memilogistics.shipmentservice.shipment.controller;
 
-import com.memilogistics.shipmentservice.dto.ShipmentEventResponse;
-import com.memilogistics.shipmentservice.service.ShipmentEventsService;
+import com.memilogistics.shipmentservice.shipment.dto.ShipmentEventResponse;
+import com.memilogistics.shipmentservice.shipment.service.ShipmentEventsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

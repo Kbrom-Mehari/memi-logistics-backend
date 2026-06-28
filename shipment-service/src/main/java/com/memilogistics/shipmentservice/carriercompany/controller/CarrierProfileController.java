@@ -1,14 +1,12 @@
-package com.memilogistics.shipmentservice.controller;
+package com.memilogistics.shipmentservice.carriercompany.controller;
 
 import com.memilogistics.commonsecurity.annotation.CurrentUser;
 import com.memilogistics.commonsecurity.principal.CustomUserPrincipal;
-import com.memilogistics.shipmentservice.dto.CarrierCompanyResponse;
-import com.memilogistics.shipmentservice.dto.CreateCarrierProfileRequest;
-import com.memilogistics.shipmentservice.dto.ShipmentResponse;
-import com.memilogistics.shipmentservice.dto.UpdateCarrierProfileRequest;
-import com.memilogistics.shipmentservice.entity.Shipment;
-import com.memilogistics.shipmentservice.mapper.ProfileMapper;
-import com.memilogistics.shipmentservice.service.CarrierProfileService;
+import com.memilogistics.shipmentservice.carriercompany.dto.CarrierCompanyResponse;
+import com.memilogistics.shipmentservice.carriercompany.dto.CreateCarrierProfileRequest;
+import com.memilogistics.shipmentservice.shipment.dto.ShipmentResponse;
+import com.memilogistics.shipmentservice.carriercompany.dto.UpdateCarrierProfileRequest;
+import com.memilogistics.shipmentservice.carriercompany.service.CarrierProfileService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

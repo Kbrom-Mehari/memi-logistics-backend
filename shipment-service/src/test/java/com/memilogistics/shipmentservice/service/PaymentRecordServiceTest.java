@@ -1,14 +1,15 @@
 package com.memilogistics.shipmentservice.service;
 
-import com.memilogistics.shipmentservice.dto.PaymentRequest;
-import com.memilogistics.shipmentservice.entity.CarrierCompany;
-import com.memilogistics.shipmentservice.entity.PaymentRecord;
-import com.memilogistics.shipmentservice.entity.Shipment;
-import com.memilogistics.shipmentservice.enums.PaymentMethod;
-import com.memilogistics.shipmentservice.enums.ShipmentStatus;
+import com.memilogistics.shipmentservice.payment.dto.PaymentRequest;
+import com.memilogistics.shipmentservice.carriercompany.entity.CarrierCompany;
+import com.memilogistics.shipmentservice.payment.entity.PaymentRecord;
+import com.memilogistics.shipmentservice.payment.service.PaymentRecordService;
+import com.memilogistics.shipmentservice.shipment.entity.Shipment;
+import com.memilogistics.shipmentservice.payment.enums.PaymentMethod;
+import com.memilogistics.shipmentservice.shipment.enums.ShipmentStatus;
 import com.memilogistics.commonsecurity.principal.CustomUserPrincipal;
-import com.memilogistics.shipmentservice.repository.CarrierCompanyRepository;
-import com.memilogistics.shipmentservice.repository.ShipmentRepository;
+import com.memilogistics.shipmentservice.carriercompany.repository.CarrierCompanyRepository;
+import com.memilogistics.shipmentservice.shipment.repository.ShipmentRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

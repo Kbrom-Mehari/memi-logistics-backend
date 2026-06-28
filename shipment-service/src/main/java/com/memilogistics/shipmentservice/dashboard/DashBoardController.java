@@ -1,6 +1,5 @@
-package com.memilogistics.shipmentservice.controller;
+package com.memilogistics.shipmentservice.dashboard;
 
-import com.memilogistics.shipmentservice.dto.DashboardInformation;
 import com.memilogistics.shipmentservice.shipment.service.ShipmentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

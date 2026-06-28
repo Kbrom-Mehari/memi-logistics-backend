@@ -1,10 +1,10 @@
-package com.memilogistics.shipmentservice.mapper;
+package com.memilogistics.shipmentservice.shipment.mapper;
 
-import com.memilogistics.shipmentservice.dto.CreateShipmentResponse;
-import com.memilogistics.shipmentservice.dto.ShipmentOfferResponse;
-import com.memilogistics.shipmentservice.dto.ShipmentResponse;
-import com.memilogistics.shipmentservice.entity.Shipment;
-import com.memilogistics.shipmentservice.entity.ShipmentOffer;
+import com.memilogistics.shipmentservice.shipment.dto.CreateShipmentResponse;
+import com.memilogistics.shipmentservice.shipment.dto.ShipmentOfferResponse;
+import com.memilogistics.shipmentservice.shipment.dto.ShipmentResponse;
+import com.memilogistics.shipmentservice.shipment.entity.Shipment;
+import com.memilogistics.shipmentservice.shipment.entity.ShipmentOffer;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
