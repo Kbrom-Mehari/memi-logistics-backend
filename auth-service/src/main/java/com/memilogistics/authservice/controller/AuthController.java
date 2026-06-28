@@ -4,6 +4,7 @@ import com.memilogistics.authservice.dto.*;
 import com.memilogistics.authservice.enums.Role;
 import com.memilogistics.authservice.service.AuthService;
 import com.memilogistics.authservice.service.PasswordResetService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -26,22 +27,11 @@ public class AuthController {
     public ResponseEntity<Void> login(@RequestBody @Valid LoginRequest loginRequest,
                                       HttpServletResponse httpResponse){
         var response =  authService.login(loginRequest);
-        ResponseCookie accessCookie =
-                ResponseCookie.from("accessToken", response.getAccessToken())
-                        .httpOnly(true)
-                        .secure(false)
-                        .path("/")
-                        .maxAge(Duration.ofMinutes(15))
-                        .sameSite("Strict")
-                        .build();
-        ResponseCookie refreshCookie =
-                ResponseCookie.from("refreshToken", response.getRefreshToken())
-                        .httpOnly(true)
-                        .secure(false)
-                        .path("/")
-                        .maxAge(Duration.ofDays(7))
-                        .sameSite("Strict")
-                        .build();
+
+        //helper methods for creating cookies
+        ResponseCookie accessCookie = createAccessCookie(response.getAccessToken());
+        ResponseCookie refreshCookie = createRefreshCookie(response.getRefreshToken());
+
         httpResponse.addHeader(
                 HttpHeaders.SET_COOKIE,
                 accessCookie.toString()
@@ -77,12 +67,61 @@ public class AuthController {
     }
 
     @PostMapping("/auth/refresh")
-    public ResponseEntity<AuthResponse> refreshToken(@RequestBody RefreshRequest refreshRequest) {
-        return ResponseEntity.ok(authService.refreshTokens(refreshRequest));
+    public ResponseEntity<Void> refreshToken(@CookieValue("refreshToken") String refreshToken,
+                                             HttpServletResponse httpResponse) {
+
+        var authResponse = authService.refreshTokens(refreshToken);
+
+        //helper methods for creating cookies
+        ResponseCookie accessCookie = createAccessCookie(authResponse.getAccessToken());
+        ResponseCookie refreshCookie = createRefreshCookie(authResponse.getRefreshToken());
+
+
+        httpResponse.addHeader(
+                HttpHeaders.SET_COOKIE,
+                accessCookie.toString()
+        );
+        httpResponse.addHeader(
+                HttpHeaders.SET_COOKIE,
+                refreshCookie.toString()
+        );
+
+        return ResponseEntity.ok().build();
     }
+
     @PostMapping("/auth/logout")
-    public ResponseEntity<Void> logout(@RequestBody LogoutRequest logoutRequest) {
-        authService.logout(logoutRequest);
+    public ResponseEntity<Void> logout(@CookieValue(value = "refreshToken", required = false) String refreshToken,
+                                       HttpServletResponse httpResponse) {
+
+        if(refreshToken != null) {
+            authService.logout(refreshToken);
+        }
+        ResponseCookie accessCookie = ResponseCookie.from(
+                        "accessToken",
+                        ""
+                )
+                .path("/")
+                .maxAge(0)
+                .build();
+
+        ResponseCookie refreshCookie =
+                ResponseCookie.from(
+                                "refreshToken",
+                                ""
+                        )
+                        .path("/auth/refresh")
+                        .maxAge(0)
+                        .build();
+
+        httpResponse.addHeader(
+                HttpHeaders.SET_COOKIE,
+                accessCookie.toString()
+        );
+        httpResponse.addHeader(
+                HttpHeaders.SET_COOKIE,
+                refreshCookie.toString()
+        );
+
         return ResponseEntity.ok().build();
     }
 
@@ -96,6 +135,25 @@ public class AuthController {
     public ResponseEntity<Void> resetPassword(@RequestBody @Valid ResetPasswordRequest request) {
         passwordResetService.resetPassword(request);
         return ResponseEntity.ok().build();
+    }
+
+    private ResponseCookie createAccessCookie(String accessToken) {
+        return ResponseCookie.from("accessToken", accessToken)
+                .httpOnly(true)
+                .secure(false)
+                .path("/")
+                .maxAge(Duration.ofMinutes(15))
+                .sameSite("Strict")
+                .build();
+    }
+    private ResponseCookie createRefreshCookie(String refreshToken) {
+        return ResponseCookie.from("refreshToken", refreshToken)
+                .httpOnly(true)
+                .secure(false)
+                .path("/api/auth/refresh")
+                .maxAge(Duration.ofDays(7))
+                .sameSite("Strict")
+                .build();
     }
 
 }

@@ -70,16 +70,16 @@ public class AuthService {
 
         return new AuthResponse(accessToken, refreshToken, ((User) userDetails).getRole().toString());
     }
-    public void logout(LogoutRequest logoutRequest){
-        String hashed =refreshTokenUtil.hash(logoutRequest.getRefreshToken());
+    public void logout(String refreshToken){
+        String hashed =refreshTokenUtil.hash(refreshToken);
         RefreshToken stored = refreshTokenRepository.findByHashedToken(hashed)
                 .orElseThrow(() -> new RuntimeException("Invalid refresh token"));
         stored.setRevoked(true);
         refreshTokenRepository.save(stored);
     }
 
-    public AuthResponse refreshTokens(RefreshRequest refreshRequest){
-        String hashed = refreshTokenUtil.hash(refreshRequest.getRefreshToken());
+    public AuthResponse refreshTokens(String refreshToken){
+        String hashed = refreshTokenUtil.hash(refreshToken);
         RefreshToken stored = refreshTokenRepository.findByHashedToken(hashed)
                 .orElseThrow(() -> new RuntimeException("Invalid refresh token"));
         if(stored.isRevoked()){
