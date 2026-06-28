@@ -43,12 +43,11 @@ public class AdminInitializer{
                         .build();
                 userRepository.save(user);
                 System.out.println("Initial admin account successfully created with email: " + adminEmail);
-
-            } else
+            }
+            else
                 System.out.println("Administrative account already exists. Skipping database seeding.");
         } catch (Exception e) {
             System.err.println("Error occurred while seeding initial admin account: " + e.getMessage());
         }
-
     }
 }
