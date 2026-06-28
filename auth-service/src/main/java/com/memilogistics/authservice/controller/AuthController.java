@@ -4,10 +4,16 @@ import com.memilogistics.authservice.dto.*;
 import com.memilogistics.authservice.enums.Role;
 import com.memilogistics.authservice.service.AuthService;
 import com.memilogistics.authservice.service.PasswordResetService;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.apache.coyote.Response;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.Duration;
 
 @RestController
 @RequestMapping("api")
@@ -17,8 +23,36 @@ public class AuthController {
     private final PasswordResetService passwordResetService;
 
     @PostMapping("/auth/login")
-    public ResponseEntity<AuthResponse> login(@RequestBody @Valid LoginRequest loginRequest){
-        return ResponseEntity.ok(authService.login(loginRequest));
+    public ResponseEntity<Void> login(@RequestBody @Valid LoginRequest loginRequest,
+                                      HttpServletResponse httpResponse){
+        var response =  authService.login(loginRequest);
+        ResponseCookie accessCookie =
+                ResponseCookie.from("accessToken", response.getAccessToken())
+                        .httpOnly(true)
+                        .secure(false)
+                        .path("/")
+                        .maxAge(Duration.ofMinutes(15))
+                        .sameSite("Strict")
+                        .build();
+        ResponseCookie refreshCookie =
+                ResponseCookie.from("refreshToken", response.getRefreshToken())
+                        .httpOnly(true)
+                        .secure(false)
+                        .path("/")
+                        .maxAge(Duration.ofDays(7))
+                        .sameSite("Strict")
+                        .build();
+        httpResponse.addHeader(
+                HttpHeaders.SET_COOKIE,
+                accessCookie.toString()
+        );
+
+        httpResponse.addHeader(
+                HttpHeaders.SET_COOKIE,
+                refreshCookie.toString()
+        );
+
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/auth/register")
