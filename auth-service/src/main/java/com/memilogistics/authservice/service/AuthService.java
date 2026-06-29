@@ -10,12 +10,14 @@ import com.memilogistics.authservice.security.JwtService;
 import com.memilogistics.authservice.util.RefreshTokenUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -81,12 +83,12 @@ public class AuthService {
     public AuthResponse refreshTokens(String refreshToken){
         String hashed = refreshTokenUtil.hash(refreshToken);
         RefreshToken stored = refreshTokenRepository.findByHashedToken(hashed)
-                .orElseThrow(() -> new RuntimeException("Invalid refresh token"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid or expired refresh token"));
         if(stored.isRevoked()){
-            throw new RuntimeException("Refresh token has been revoked");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Refresh token has been revoked");
         }
         if(stored.getExpiresAt().isBefore(LocalDateTime.now())){
-            throw new RuntimeException("Refresh token has expired");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Refresh token has expired");
         }
 
         User user = stored.getUser();
