@@ -4,6 +4,7 @@ import com.memilogistics.commonsecurity.constants.SecurityConstants;
 import com.memilogistics.commonsecurity.principal.CustomUserPrincipal;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -31,14 +32,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             @NonNull FilterChain filterChain
             ) throws ServletException, IOException {
 
-        final String authHeader = request.getHeader(SecurityConstants.AUTHORIZATION_HEADER);
-
-        if (authHeader == null || !authHeader.startsWith(SecurityConstants.BEARER_PREFIX)) {
-            filterChain.doFilter(request, response);
-            return;
+        String token = null;
+        Cookie[] cookies = request.getCookies();
+        if(cookies != null) {
+            for(Cookie cookie : cookies) {
+                if(cookie.getName().equals("accessToken")){
+                    token = cookie.getValue();
+                    break;
+                }
+            }
         }
-
-        final String token = authHeader.substring(7);
 
         if(!jwtTokenProvider.isTokenValid(token)){
             filterChain.doFilter(request, response);
