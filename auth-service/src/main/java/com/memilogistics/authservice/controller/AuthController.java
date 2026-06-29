@@ -10,9 +10,11 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.Response;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Duration;
 
@@ -67,9 +69,11 @@ public class AuthController {
     }
 
     @PostMapping("/auth/refresh")
-    public ResponseEntity<Void> refreshToken(@CookieValue("refreshToken") String refreshToken,
+    public ResponseEntity<Void> refreshToken(@CookieValue(value = "refreshToken", required = false) String refreshToken,
                                              HttpServletResponse httpResponse) {
-
+        if(refreshToken == null || refreshToken.isEmpty()){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
         var authResponse = authService.refreshTokens(refreshToken);
 
         //helper methods for creating cookies
@@ -109,7 +113,7 @@ public class AuthController {
                                 "refreshToken",
                                 ""
                         )
-                        .path("/auth/refresh")
+                        .path("/api/auth/refresh")
                         .maxAge(0)
                         .build();
 
