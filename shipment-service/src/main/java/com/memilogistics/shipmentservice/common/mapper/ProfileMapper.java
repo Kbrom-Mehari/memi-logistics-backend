@@ -1,47 +1,47 @@
 package com.memilogistics.shipmentservice.common.mapper;
 
-import com.memilogistics.shipmentservice.carriercompany.dto.CarrierCompanyResponse;
-import com.memilogistics.shipmentservice.shipperprofile.dto.ShipperProfileResponse;
-import com.memilogistics.shipmentservice.carriercompany.entity.CarrierCompany;
-import com.memilogistics.shipmentservice.shipperprofile.entity.ShipperProfile;
+import com.memilogistics.shipmentservice.companyprofile.dto.CompanyProfileResponse;
+import com.memilogistics.shipmentservice.userprofile.dto.UserProfileResponse;
+import com.memilogistics.shipmentservice.companyprofile.entity.CompanyProfile;
+import com.memilogistics.shipmentservice.userprofile.entity.UserProfile;
 import org.springframework.stereotype.Component;
 
 @Component
 public class ProfileMapper {
-    public ShipperProfileResponse toShipperProfileResponse(ShipperProfile shipper) {
-        if (shipper == null) {
+    public UserProfileResponse toUserProfileResponse(UserProfile userProfile) {
+        if (userProfile == null) {
             return null;
         }
-        ShipperProfileResponse response = new ShipperProfileResponse();
-        response.setId(shipper.getId());
-        response.setEmail(shipper.getAuthenticationEmail());
-        response.setFirstName(shipper.getFirstName());
-        response.setLastName(shipper.getLastName());
-        response.setCompanyName(shipper.getCompanyName());
-        response.setBusinessName(shipper.getBusinessName());
-        response.setStreet(shipper.getAddress().getStreet());
-        response.setCity(shipper.getAddress().getCity());
-        response.setZip(shipper.getAddress().getZip());
-        response.setState(shipper.getAddress().getState());
-        response.setCountry(shipper.getAddress().getCountry());
-        response.setPhoneNumber(shipper.getAddress().getPhoneNumber());
+        UserProfileResponse response = new UserProfileResponse();
+        response.setId(userProfile.getProfileId());
+        response.setAuthenticationId(userProfile.getAuthenticationId());
+        response.setFirstName(userProfile.getFirstName());
+        response.setLastName(userProfile.getLastName());
+
+        response.setBusinessName(userProfile.getBusinessName());
+        response.setStreet(userProfile.getAddress().getStreet());
+        response.setCity(userProfile.getAddress().getCity());
+        response.setZip(userProfile.getAddress().getZip());
+        response.setState(userProfile.getAddress().getState());
+        response.setCountry(userProfile.getAddress().getCountry());
+        response.setPhoneNumber(userProfile.getAddress().getPhoneNumber());
         return response;
     }
 
-    public CarrierCompanyResponse toCarrierCompanyResponse(CarrierCompany carrier) {
-        if (carrier == null) {
+    public CompanyProfileResponse toCompanyProfileResponse(CompanyProfile companyProfile) {
+        if (companyProfile == null) {
             return null;
         }
-        CarrierCompanyResponse response = new CarrierCompanyResponse();
-        response.setId(carrier.getId());
-        response.setCompanyName(carrier.getCompanyName());
-        response.setCompanyEmail(carrier.getCompanyEmail());
-        response.setStreet(carrier.getAddress().getStreet());
-        response.setCity(carrier.getAddress().getCity());
-        response.setState(carrier.getAddress().getState());
-        response.setCountry(carrier.getAddress().getCountry());
-        response.setZip(carrier.getAddress().getZip());
-        response.setPhoneNumber(carrier.getAddress().getPhoneNumber());
+        CompanyProfileResponse response = new CompanyProfileResponse();
+        response.setId(companyProfile.getCompanyProfileId());
+        response.setCompanyName(companyProfile.getCompanyName());
+        response.setCompanyEmail(companyProfile.getCompanyEmail());
+        response.setStreet(companyProfile.getAddress().getStreet());
+        response.setCity(companyProfile.getAddress().getCity());
+        response.setState(companyProfile.getAddress().getState());
+        response.setCountry(companyProfile.getAddress().getCountry());
+        response.setZip(companyProfile.getAddress().getZip());
+        response.setPhoneNumber(companyProfile.getAddress().getPhoneNumber());
         return response;
     }
 
