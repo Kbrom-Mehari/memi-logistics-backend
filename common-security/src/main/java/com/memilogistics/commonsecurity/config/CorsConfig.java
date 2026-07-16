@@ -15,7 +15,8 @@ public class CorsConfig {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(List.of(
                 "http://localhost:3000",
-                "http://localhost:5173"
+                "http://localhost:5173",
+                "https://memi-logistics.netlify.app"
 
         ));
         configuration.setAllowedMethods(List.of(
