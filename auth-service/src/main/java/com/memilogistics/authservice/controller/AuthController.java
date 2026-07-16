@@ -4,6 +4,8 @@ import com.memilogistics.authservice.dto.*;
 import com.memilogistics.authservice.enums.Role;
 import com.memilogistics.authservice.service.AuthService;
 import com.memilogistics.authservice.service.PasswordResetService;
+import com.memilogistics.commonsecurity.annotation.CurrentUser;
+import com.memilogistics.commonsecurity.principal.CustomUserPrincipal;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -48,23 +50,8 @@ public class AuthController {
     }
 
     @PostMapping("/auth/register")
-    public ResponseEntity<Void> register(
-            @RequestParam("role") String role,
-            @RequestBody @Valid RegisterRequest registerRequest
-    ){
-        Role parsedRole;
-        try {
-            parsedRole = Role.valueOf(role.trim().toUpperCase());
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("Invalid role. Allowed roles: shipper, carrier");
-        }
-
-        if (parsedRole == Role.ADMIN) {
-            throw new IllegalArgumentException("ADMIN registration is not allowed");
-        }
-
-        authService.register(registerRequest, parsedRole);
-
+    public ResponseEntity<Void> register(@RequestBody @Valid RegisterRequest registerRequest){
+        authService.register(registerRequest);
         return ResponseEntity.ok().build();
     }
 
@@ -139,6 +126,12 @@ public class AuthController {
     public ResponseEntity<Void> resetPassword(@RequestBody @Valid ResetPasswordRequest request) {
         passwordResetService.resetPassword(request);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/auth/me")
+    public ResponseEntity<UserResponse> getCurrentUser(@CurrentUser CustomUserPrincipal userPrincipal) {
+        var response = authService.getCurrentUser(userPrincipal);
+        return ResponseEntity.ok(response);
     }
 
     private ResponseCookie createAccessCookie(String accessToken) {

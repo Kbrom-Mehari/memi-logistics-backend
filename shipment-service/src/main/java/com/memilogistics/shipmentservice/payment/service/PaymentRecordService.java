@@ -3,13 +3,12 @@ package com.memilogistics.shipmentservice.payment.service;
 import com.memilogistics.commonsecurity.annotation.CurrentUser;
 import com.memilogistics.commonsecurity.principal.CustomUserPrincipal;
 import com.memilogistics.shipmentservice.payment.dto.PaymentRequest;
-import com.memilogistics.shipmentservice.carriercompany.entity.CarrierCompany;
+import com.memilogistics.shipmentservice.companyprofile.entity.CompanyProfile;
 import com.memilogistics.shipmentservice.payment.entity.PaymentRecord;
 import com.memilogistics.shipmentservice.shipment.entity.Shipment;
 import com.memilogistics.shipmentservice.shipment.entity.ShipmentEvent;
 import com.memilogistics.shipmentservice.shipment.enums.ShipmentStatus;
-import com.memilogistics.shipmentservice.carriercompany.repository.CarrierCompanyRepository;
-import com.memilogistics.shipmentservice.payment.repository.PaymentRecordRepository;
+import com.memilogistics.shipmentservice.companyprofile.repository.CompanyProfileRepository;
 import com.memilogistics.shipmentservice.shipment.repository.ShipmentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -24,8 +23,7 @@ import java.util.Currency;
 @RequiredArgsConstructor
 public class PaymentRecordService {
     private final ShipmentRepository shipmentRepository;
-    private final CarrierCompanyRepository carrierCompanyRepository;
-    private final PaymentRecordRepository paymentRecordRepository;
+    private final CompanyProfileRepository carrierCompanyRepository;
 
 
     @Transactional
@@ -84,8 +82,8 @@ public class PaymentRecordService {
 
     @Transactional
     public void confirmPayment(Long shipmentId, @CurrentUser CustomUserPrincipal user) {
-        CarrierCompany carrierCompany = carrierCompanyRepository.findByAuthenticationEmail(user.getUsername()).orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Carrier company not found for user: " + user.getUsername())
+        CompanyProfile carrierCompany = carrierCompanyRepository.findByAuthenticationId(user.getId()).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Carrier company not found for user: " + user.getId())
         );
 
         Shipment shipment = shipmentRepository.findById(shipmentId).orElseThrow(
@@ -99,7 +97,7 @@ public class PaymentRecordService {
             );
         }
 
-        if(!shipment.getAssignedCarrier().getId().equals(carrierCompany.getId())) {
+        if(!shipment.getAssignedCarrier().getCompanyProfileId().equals(carrierCompany.getCompanyProfileId())) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Carrier not assigned to this shipment");
         }
 

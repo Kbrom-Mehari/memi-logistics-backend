@@ -58,8 +58,9 @@ public class ShipmentController {
         }
     }
     @DeleteMapping("/{shipmentId}")
-    public ResponseEntity<Void> deleteShipment(@PathVariable("shipmentId") Long id){
-        shipmentService.deleteShipment(id);
+    public ResponseEntity<Void> deleteShipment(@PathVariable("shipmentId") Long id,
+                                               CustomUserPrincipal user){
+        shipmentService.deleteShipment(id, user);
         return ResponseEntity.noContent().build();
 
     }
@@ -117,15 +118,12 @@ public class ShipmentController {
         return ResponseEntity.ok(shipments);
     }
 
-    @GetMapping("/dashboard")
-    public ResponseEntity<DashboardInformation> getDashboardInformation() {
-        return ResponseEntity.ok(shipmentService.getDashboardInformation());
-    }
-
     @PatchMapping("/update/{shipmentId}")
-    public ResponseEntity<ShipmentResponse> updateShipment(@PathVariable("shipmentId") Long id, @RequestBody UpdateShipmentRequest update) {
+    public ResponseEntity<ShipmentResponse> updateShipment(@PathVariable("shipmentId") Long id,
+                                                           @RequestBody UpdateShipmentRequest update,
+                                                           CustomUserPrincipal  user) {
         try {
-            return ResponseEntity.ok(shipmentMapper.toResponse(shipmentService.updateShipment(id, update)));
+            return ResponseEntity.ok(shipmentMapper.toResponse(shipmentService.updateShipment(id, update,  user)));
         } catch (IllegalArgumentException ex) {
             String message = ex.getMessage() == null ? "Invalid request" : ex.getMessage();
             if (message.toLowerCase().contains("not found")) {

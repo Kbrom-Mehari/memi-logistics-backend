@@ -2,11 +2,12 @@ package com.memilogistics.shipmentservice.shipment.service;
 
 import com.memilogistics.commonsecurity.annotation.CurrentUser;
 import com.memilogistics.commonsecurity.principal.CustomUserPrincipal;
-import com.memilogistics.shipmentservice.carriercompany.entity.CarrierCompany;
+import com.memilogistics.shipmentservice.companyprofile.entity.CompanyProfile;
+import com.memilogistics.shipmentservice.shipment.dto.ShipmentOfferRequest;
 import com.memilogistics.shipmentservice.shipment.entity.Shipment;
 import com.memilogistics.shipmentservice.shipment.entity.ShipmentOffer;
 import com.memilogistics.shipmentservice.shipment.enums.ShipmentStatus;
-import com.memilogistics.shipmentservice.carriercompany.repository.CarrierCompanyRepository;
+import com.memilogistics.shipmentservice.companyprofile.repository.CompanyProfileRepository;
 import com.memilogistics.shipmentservice.shipment.repository.ShipmentOfferRepository;
 import com.memilogistics.shipmentservice.shipment.repository.ShipmentRepository;
 import jakarta.transaction.Transactional;
@@ -23,28 +24,39 @@ import java.time.LocalDateTime;
 public class ShipmentAssignmentService {
     private final ShipmentOfferRepository shipmentOfferRepository;
     private final ShipmentRepository shipmentRepository;
-    private final CarrierCompanyRepository carrierCompanyRepository;
+    private final CompanyProfileRepository companyProfileRepository;
 
     @Transactional
-    public void offerShipment(Long shipmentId, @CurrentUser CustomUserPrincipal user, BigDecimal price) {
+    public void offerShipment(@CurrentUser CustomUserPrincipal user, ShipmentOfferRequest request) {
         ShipmentOffer shipmentOffer = new ShipmentOffer();
-        Shipment shipment = shipmentRepository.findById(shipmentId).
+        Shipment shipment = shipmentRepository.findById(request.getShipmentId()).
                 orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND, "shipment with id " + shipmentId + " not found"
+                        HttpStatus.NOT_FOUND, "shipment with id " + request.getShipmentId() + " not found"
                 ));
+        if(shipment.getShipper().getAuthenticationId().equals(user.getId())){
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You cannot bid on your own shipment");
+        }
 
-        CarrierCompany carrierCompany = carrierCompanyRepository.findByAuthenticationEmail(user.getUsername())
+        CompanyProfile companyProfile = companyProfileRepository.findByAuthenticationId(user.getId())
                 .orElseThrow(()-> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND, "carrier company not found"
+                        HttpStatus.FORBIDDEN, "You must complete your company profile before offering a shipment."
                 ));
 
-        shipmentOffer.setPrice(price);
+        shipmentOffer.setPrice(request.getPrice());
+        shipmentOffer.setCurrencyCode(request.getCurrencyCode());
         shipmentOffer.setCreatedAt(LocalDateTime.now());
         shipmentOffer.setShipment(shipment);
-        shipmentOffer.setCarrierCompany(carrierCompany);
+        shipmentOffer.setCarrierCompany(companyProfile);
 
         shipment.getShipmentOffers().add(shipmentOffer);
+        // maintain bidirectional relation on company profile as well
+        companyProfile.getOfferedShipments().add(shipmentOffer);
+
         shipment.setStatus(ShipmentStatus.ACCEPTED);
+
+        // persist the new offer and updated shipment
+        shipmentOfferRepository.save(shipmentOffer);
+        shipmentRepository.save(shipment);
     }
 
     @Transactional
@@ -56,20 +68,20 @@ public class ShipmentAssignmentService {
                         )
                 );
 
-        CarrierCompany carrierCompany = carrierCompanyRepository.findByAuthenticationEmail(user.getUsername())
+        CompanyProfile companyProfile = companyProfileRepository.findByAuthenticationId(user.getId())
                 .orElseThrow(
                         ()-> new ResponseStatusException(
                                 HttpStatus.NOT_FOUND, "carrier company not found"
                         )
                 );
 
-        if(!shipmentOffer.getCarrierCompany().getId().equals(carrierCompany.getId())){
+        if(!shipmentOffer.getCarrierCompany().getCompanyProfileId().equals(companyProfile.getCompanyProfileId())){
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "cannot cancel another carrier's offer");
         }
 
         var shipment = shipmentOffer.getShipment();
 
-        carrierCompany.getOfferedShipments().remove(shipmentOffer);
+        companyProfile.getOfferedShipments().remove(shipmentOffer);
         shipment.getShipmentOffers().remove(shipmentOffer);
 
         if(shipment.getShipmentOffers().isEmpty()){
@@ -82,12 +94,11 @@ public class ShipmentAssignmentService {
     @Transactional
     public void assignCarrier(Long shipmentId, Long carrierId) {
         Shipment shipment = shipmentRepository.findById(shipmentId)
-                .orElseThrow(
-                        ()-> new ResponseStatusException(
+                .orElseThrow( ()-> new ResponseStatusException(
                         HttpStatus.NOT_FOUND, "Shipment with id " + shipmentId + " not found"
                         )
                 );
-        CarrierCompany carrierCompany = carrierCompanyRepository.findById(carrierId)
+        CompanyProfile carrierCompany = companyProfileRepository.findById(carrierId)
                 .orElseThrow(
                         ()-> new ResponseStatusException(
                                 HttpStatus.NOT_FOUND, "carrier company with id " + carrierId + " not found"

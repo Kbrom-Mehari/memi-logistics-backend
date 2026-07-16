@@ -2,6 +2,7 @@ package com.memilogistics.shipmentservice.shipment.controller;
 
 import com.memilogistics.commonsecurity.annotation.CurrentUser;
 import com.memilogistics.commonsecurity.principal.CustomUserPrincipal;
+import com.memilogistics.shipmentservice.shipment.dto.ShipmentOfferRequest;
 import com.memilogistics.shipmentservice.shipment.service.ShipmentAssignmentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -19,11 +20,10 @@ public class ShipmentAssignmentController {
 
     @PostMapping("/{shipmentId}/offer-shipment")
     @PreAuthorize("hasRole('ROLE_CARRIER') or hasRole('ROLE_ADMIN')")
-    public ResponseEntity<Void> offerShipment(@PathVariable("shipmentId") Long shipmentId,
-                                              @RequestParam("price") BigDecimal price,
+    public ResponseEntity<Void> offerShipment(@RequestBody ShipmentOfferRequest request,
                                               @CurrentUser CustomUserPrincipal user
                                               ) {
-        shipmentAssignmentService.offerShipment(shipmentId, user, price);
+        shipmentAssignmentService.offerShipment(user, request);
         return ResponseEntity.ok().build();
     }
 

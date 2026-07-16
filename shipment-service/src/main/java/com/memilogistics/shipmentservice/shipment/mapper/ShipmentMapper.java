@@ -38,11 +38,11 @@ public class ShipmentMapper {
         response.setCompletedAt(shipment.getCompletedAt());
 
         if (shipment.getShipper() != null) {
-            response.setShipperId(shipment.getShipper().getId());
+            response.setShipperId(shipment.getShipper().getProfileId());
         }
 
         if (shipment.getAssignedCarrier() != null) {
-            response.setAssignedCarrierId(shipment.getAssignedCarrier().getId());
+            response.setAssignedCarrierId(shipment.getAssignedCarrier().getCompanyProfileId());
         }
 
         return response;
@@ -71,7 +71,7 @@ public class ShipmentMapper {
         }
 
         if (offer.getCarrierCompany() != null) {
-            response.setCarrierCompanyId(offer.getCarrierCompany().getId());
+            response.setCarrierCompanyId(offer.getCarrierCompany().getCompanyProfileId());
         }
 
         return response;

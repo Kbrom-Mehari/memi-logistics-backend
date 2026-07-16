@@ -9,6 +9,6 @@ import java.math.BigDecimal;
 @Setter
 public class ShipmentOfferRequest {
     private Long shipmentId;
-    private Long carrierCompanyId;
     private BigDecimal price;
+    private String currencyCode;
 }

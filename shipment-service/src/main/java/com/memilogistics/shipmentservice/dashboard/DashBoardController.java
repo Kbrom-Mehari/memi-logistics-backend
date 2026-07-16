@@ -12,11 +12,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/dashboard")
 @RequiredArgsConstructor
 public class DashBoardController {
-    private final ShipmentService shipmentService;
+    private final DashboardInformationService dashboardInformationService;
 
     @GetMapping("/information")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<DashboardInformation>  getDashboardInformation() {
-        return ResponseEntity.ok(shipmentService.getDashboardInformation());
+        return ResponseEntity.ok(dashboardInformationService.getDashboardInformation());
     }
 }

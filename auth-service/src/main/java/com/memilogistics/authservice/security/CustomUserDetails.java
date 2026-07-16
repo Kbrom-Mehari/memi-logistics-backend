@@ -1,6 +1,7 @@
 package com.memilogistics.authservice.security;
 
 import com.memilogistics.authservice.entity.User;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
 import org.springframework.security.core.GrantedAuthority;

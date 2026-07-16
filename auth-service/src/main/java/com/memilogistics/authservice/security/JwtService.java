@@ -1,5 +1,6 @@
 package com.memilogistics.authservice.security;
 
+import com.memilogistics.authservice.entity.User;
 import com.memilogistics.commonsecurity.config.JwtProperties;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -26,7 +27,7 @@ public class  JwtService {
 		this.jwtExpirationMs = properties.getExpiration();
 	}
 
-	public String extractUsername(String token) {
+	public String extractUserId(String token) {
 		return extractClaim(token, Claims::getSubject);
 	}
 
@@ -35,15 +36,15 @@ public class  JwtService {
 		return claimsResolver.apply(claims);
 	}
 
-	public String generateToken(UserDetails user) {
-		Map<String, Object> claims = Map.of("roles", user.getAuthorities()
+	public String generateToken(CustomUserDetails user) {
+		Map<String, Object> claims = Map.of("authorities" , user.getAuthorities()
 				.stream()
 				.map(GrantedAuthority::getAuthority)
-				.toList());
+				.toList(), "email", user.getUsername());
 		return generateToken(claims, user);
 	}
 
-	public String generateToken(Map<String, Object> claims, UserDetails user) {
+	public String generateToken(Map<String, Object> claims, CustomUserDetails user) {
 		Instant now = Instant.now();
 		Instant expiry = now.plusMillis(jwtExpirationMs);
 		Date issuedAt = Date.from(now);
@@ -51,17 +52,17 @@ public class  JwtService {
 
 		return Jwts.builder()
 				.claims(claims)
-				.subject(user.getUsername())
+				.subject(user.getId())
 				.issuedAt(issuedAt)
-				.issuer("memilogistics.com")
+				.issuer("logicare.com")
 				.expiration(expiryDate)
 				.signWith(getSigningKey())
 				.compact();
 	}
 
-	public boolean isTokenValid(String token, UserDetails user) {
-		String username = extractUsername(token);
-		return username.equals(user.getUsername()) && !isTokenExpired(token);
+	public boolean isTokenValid(String token, CustomUserDetails user) {
+		String id = extractUserId(token);
+		return id.equals(user.getId()) && !isTokenExpired(token);
 	}
 
 	private boolean isTokenExpired(String token) {

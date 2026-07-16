@@ -1,4 +1,4 @@
-package com.memilogistics.shipmentservice.service;
+package com.memilogistics.shipmentservice.shipment.service;
 
 import com.memilogistics.shipmentservice.shipment.dto.ShipmentEventResponse;
 import com.memilogistics.shipmentservice.shipment.entity.Shipment;

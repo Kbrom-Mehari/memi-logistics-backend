@@ -1,6 +1,7 @@
 package com.memilogistics.authservice.config;
 
 import com.memilogistics.authservice.entity.User;
+import com.memilogistics.authservice.enums.Permissions;
 import com.memilogistics.authservice.enums.Role;
 import com.memilogistics.authservice.repository.UserRepository;
 import jakarta.transaction.Transactional;
@@ -12,6 +13,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 import java.util.UUID;
 
 @Component
@@ -29,7 +31,7 @@ public class AdminInitializer{
     @Transactional
     public void seedAdminOnStartup() {
         boolean adminExists = userRepository.existsByEmail(adminEmail) ||
-                userRepository.existsByRole(Role.ADMIN);
+                userRepository.existsByRolesContaining(Role.ADMIN);
 
         try {
             if (!adminExists) {
@@ -37,7 +39,8 @@ public class AdminInitializer{
                 User user = User.builder()
                         .id(UUID.randomUUID().toString())
                         .email(adminEmail)
-                        .role(Role.ADMIN)
+                        .roles(Set.of(Role.ADMIN))
+                        .permissions(Set.of(Permissions.CREATE_LOAD, Permissions.OFFER_SHIPMENT))
                         .password(passwordEncoder.encode(adminPassword))
                         .createdAt(LocalDateTime.now())
                         .build();

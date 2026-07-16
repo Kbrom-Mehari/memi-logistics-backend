@@ -10,11 +10,11 @@ import com.memilogistics.shipmentservice.shipment.dto.UpdateShipmentRequest;
 import com.memilogistics.shipmentservice.shipment.entity.Shipment;
 import com.memilogistics.shipmentservice.shipment.entity.ShipmentEvent;
 import com.memilogistics.shipmentservice.shipment.entity.ShipmentOffer;
-import com.memilogistics.shipmentservice.shipperprofile.entity.ShipperProfile;
+import com.memilogistics.shipmentservice.userprofile.entity.UserProfile;
 import com.memilogistics.shipmentservice.shipment.enums.ShipmentStatus;
-import com.memilogistics.shipmentservice.carriercompany.repository.CarrierCompanyRepository;
+import com.memilogistics.shipmentservice.companyprofile.repository.CompanyProfileRepository;
 import com.memilogistics.shipmentservice.shipment.repository.ShipmentRepository;
-import com.memilogistics.shipmentservice.shipperprofile.repository.ShipperProfileRepository;
+import com.memilogistics.shipmentservice.userprofile.repository.UserProfileRepository;
 import com.memilogistics.shipmentservice.shipment.mapper.ShipmentMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -33,18 +33,19 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class ShipmentService {
     private final ShipmentRepository shipmentRepository;
-    private final ShipperProfileRepository shipperProfileRepository;
-    private final CarrierCompanyRepository carrierCompanyRepository;
+    private final UserProfileRepository userProfileRepository;
+    private final CompanyProfileRepository companyProfileRepository;
     private final ShipmentMapper shipmentMapper;
 
     public CreateShipmentResponse createShipment(@CurrentUser CustomUserPrincipal user, CreateShipmentRequest request) {
-        ShipperProfile shipper = shipperProfileRepository.findByAuthenticationEmail(user.getUsername())
+        UserProfile userProfile = userProfileRepository.findByAuthenticationId(user.getId())
                 .orElseThrow(
-                        ()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "Shipper profile not found for user: " + user.getUsername())
+                        ()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "User profile not found for user: " + user.getId())
                 );
 
+
         Shipment shipment = new Shipment();
-        shipment.setShipper(shipper);
+        shipment.setShipper(userProfile);
         shipment.setShipmentItem(request.getShipmentItem());
         shipment.setTrackingNumber(generateTrackingNumber());
         shipment.setOrigin(request.getOrigin());
@@ -97,7 +98,7 @@ public class ShipmentService {
 
     public List<ShipmentResponse> listShipmentsByFragile(boolean fragile, int page, int size) {
         Pageable pageable = PageRequest.of(Math.max(page, 0), Math.max(size, 1));
-        var shipments = shipmentRepository.findAllByFragile(fragile, pageable).orElse(List.of());
+        var shipments = shipmentRepository.findAllByFragile(fragile, pageable);
         return shipmentMapper.toResponseList(shipments);
     }
 
@@ -118,10 +119,10 @@ public class ShipmentService {
             int page,
             int size
     ){
-        var email = user.getUsername();
+
         Pageable pageable = PageRequest.of(Math.max(page, 0), Math.max(size, 1));
 
-        return shipmentRepository.findByShipperAuthenticationEmail(email, pageable)
+        return shipmentRepository.findByShipperAuthenticationId(user.getId(), pageable)
                 .map(shipmentMapper::toResponse);
     }
 
@@ -131,19 +132,23 @@ public class ShipmentService {
             int page,
             int size
     ){
-        var email = user.getUsername();
         Pageable pageable = PageRequest.of(Math.max(page, 0), Math.max(size, 1));
-        Page<Shipment> shipments = shipmentRepository.findByShipperAuthenticationEmailAndStatus(email, status, pageable);
+        Page<Shipment> shipments = shipmentRepository
+                .findByShipperAuthenticationIdAndStatus(user.getId(), status, pageable);
 
         return shipments.map(shipmentMapper::toResponse);
     }
 
     @Transactional
-    public Shipment updateShipment(Long id, UpdateShipmentRequest update) {
+    public Shipment updateShipment(Long id, UpdateShipmentRequest update, CustomUserPrincipal user) {
         if (update == null) {
             throw new IllegalArgumentException("Shipment update data is required");
         }
         Shipment existing = getShipment(id);
+
+        if(!existing.getShipper().getAuthenticationId().equals(user.getId())){
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not authorized to update this shipment");
+        }
 
         if (update.getOrigin() != null && !update.getOrigin().isBlank()) {
             existing.setOrigin(update.getOrigin());
@@ -166,7 +171,7 @@ public class ShipmentService {
         return shipmentRepository.save(existing);
     }
 
-    public void deleteShipment(Long id) {
+    public void deleteShipment(Long id, CustomUserPrincipal user) {
         var shipment = shipmentRepository.findById(id)
                 .orElseThrow(() ->
                         new ResponseStatusException(
@@ -174,6 +179,10 @@ public class ShipmentService {
                                 "Shipment not found with id: " + id
                         )
                 );
+
+        if(!user.getId().equals(shipment.getShipper().getAuthenticationId())){
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not authorized to delete this shipment");
+        }
 
         if (shipment.getStatus() != ShipmentStatus.PENDING
                 && shipment.getStatus() != ShipmentStatus.ACCEPTED) {
@@ -186,22 +195,16 @@ public class ShipmentService {
 
     }
 
-    public void deleteShipmentByTrackingNumber(String trackingNumber) {
+    public void deleteShipmentByTrackingNumber(String trackingNumber, CustomUserPrincipal user) {
+        var shipment = shipmentRepository.findByTrackingNumber(trackingNumber).orElseThrow(
+                ()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "Shipment not found with trackingNumber: " + trackingNumber)
+        );
+        if(!user.getId().equals(shipment.getShipper().getAuthenticationId())){
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not authorized to delete this shipment");
+        }
         shipmentRepository.deleteByTrackingNumber(trackingNumber);
     }
-
-    public DashboardInformation getDashboardInformation() {
-        return new DashboardInformation(
-                shipmentRepository.countByStatus(ShipmentStatus.PENDING),
-                shipmentRepository.countByStatus(ShipmentStatus.COMPLETED),
-                shipmentRepository.countByFragile(true),
-                shipmentRepository.countByFragile(false),
-                shipperProfileRepository.count(),
-                carrierCompanyRepository.count(),
-                carrierCompanyRepository.count() + shipperProfileRepository.count(),
-                shipmentRepository.count()
-                );
-    }
+    
 
     private String generateTrackingNumber() {
         return "TRK-" + UUID.randomUUID().toString().replace("-", "").substring(0, 12).toUpperCase();

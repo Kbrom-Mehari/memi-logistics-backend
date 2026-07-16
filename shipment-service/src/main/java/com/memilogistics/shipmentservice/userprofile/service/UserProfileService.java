@@ -1,79 +1,77 @@
-package com.memilogistics.shipmentservice.shipperprofile.service;
+package com.memilogistics.shipmentservice.userprofile.service;
 
 import com.memilogistics.commonsecurity.annotation.CurrentUser;
 import com.memilogistics.commonsecurity.principal.CustomUserPrincipal;
-import com.memilogistics.shipmentservice.shipperprofile.dto.CreateShipperProfileRequest;
+import com.memilogistics.shipmentservice.userprofile.dto.CreateUserProfileRequest;
 import com.memilogistics.shipmentservice.address.entity.Address;
-import com.memilogistics.shipmentservice.shipperprofile.entity.ShipperProfile;
+import com.memilogistics.shipmentservice.userprofile.entity.UserProfile;
 import com.memilogistics.shipmentservice.address.repository.AddressRepository;
 import com.memilogistics.shipmentservice.common.mapper.ProfileMapper;
-import com.memilogistics.shipmentservice.shipperprofile.dto.UpdateShipperProfileRequest;
-import com.memilogistics.shipmentservice.shipperprofile.dto.ShipperProfileResponse;
-import com.memilogistics.shipmentservice.shipperprofile.repository.ShipperProfileRepository;
+import com.memilogistics.shipmentservice.userprofile.dto.UpdateUserProfileRequest;
+import com.memilogistics.shipmentservice.userprofile.dto.UserProfileResponse;
+import com.memilogistics.shipmentservice.userprofile.repository.UserProfileRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 @Service
 @RequiredArgsConstructor
-public class ShipperProfileService {
-    private final ShipperProfileRepository shipperProfileRepository;
+public class UserProfileService {
+    private final UserProfileRepository userProfileRepository;
     private final AddressRepository addressRepository;
     private final ProfileMapper profileMapper;
 
     @Transactional
-    public ShipperProfileResponse createShipperProfile(@CurrentUser CustomUserPrincipal user,
-                                                       CreateShipperProfileRequest request) {
-        if (user == null || user.getUsername() == null || user.getUsername().isBlank()) {
+    public UserProfileResponse createUserProfile(@CurrentUser CustomUserPrincipal user,
+                                                 CreateUserProfileRequest request) {
+        if (user == null || user.getId() == null || user.getId().isBlank()) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User context is required");
         }
         if (request == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Shipper profile data is required");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User profile data is required");
         }
 
-        shipperProfileRepository.findByAuthenticationEmail(user.getUsername()).ifPresent(existing -> {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Shipper profile already exists");
+        userProfileRepository.findByAuthenticationId(user.getId()).ifPresent(existing -> {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "User profile already exists");
         });
 
         Address address = buildAddress(request);
         addressRepository.save(address);
 
-        ShipperProfile profile = new ShipperProfile();
-        profile.setAuthenticationEmail(user.getUsername());
+        UserProfile profile = new UserProfile();
+
+        profile.setAuthenticationId(user.getId());
         profile.setFirstName(request.getFirstName());
         profile.setLastName(request.getLastName());
-        profile.setCompanyName(request.getCompanyName());
         profile.setBusinessName(request.getBusinessName());
         profile.setAddress(address);
 
-        var shipperProfile = shipperProfileRepository.save(profile);
-        return profileMapper.toShipperProfileResponse(shipperProfile);
+        return profileMapper.toUserProfileResponse(userProfileRepository.save(profile));
     }
 
     @Transactional
-    public ShipperProfileResponse updateShipperProfile(@CurrentUser CustomUserPrincipal user,
-                                               UpdateShipperProfileRequest request) {
-        if (user == null || user.getUsername() == null || user.getUsername().isBlank()) {
+    public UserProfileResponse updateUserProfile(@CurrentUser CustomUserPrincipal user,
+                                                    UpdateUserProfileRequest request) {
+        if (user == null || user.getId() == null || user.getId().isBlank()) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User context is required");
         }
         if (request == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Shipper profile update data is required");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User profile update data is required");
         }
 
-        ShipperProfile profile = shipperProfileRepository.findByAuthenticationEmail(user.getUsername())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Shipper profile not found"));
+        UserProfile profile = userProfileRepository.findByAuthenticationId(user.getId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User profile not found"));
 
         if (request.getFirstName() != null && !request.getFirstName().isBlank()) {
             profile.setFirstName(request.getFirstName());
         }
+
         if (request.getLastName() != null && !request.getLastName().isBlank()) {
             profile.setLastName(request.getLastName());
         }
-        if (request.getCompanyName() != null && !request.getCompanyName().isBlank()) {
-            profile.setCompanyName(request.getCompanyName());
-        }
+
         if (request.getBusinessName() != null && !request.getBusinessName().isBlank()) {
             profile.setBusinessName(request.getBusinessName());
         }
@@ -88,28 +86,28 @@ public class ShipperProfileService {
             profile.setAddress(address);
         }
 
-        var shipperProfile = shipperProfileRepository.save(profile);
-        return profileMapper.toShipperProfileResponse(shipperProfile);
+        var userProfile = userProfileRepository.save(profile);
+        return profileMapper.toUserProfileResponse(userProfile);
     }
 
-    public ShipperProfileResponse getShipperProfile(@CurrentUser CustomUserPrincipal user){
-        if (user == null || user.getUsername() == null || user.getUsername().isBlank()) {
+    public UserProfileResponse getUserProfile(@CurrentUser CustomUserPrincipal user){
+        if (user == null || user.getId() == null || user.getId().isBlank()) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User context is required");
         }
-        ShipperProfile profile = shipperProfileRepository.findByAuthenticationEmail(user.getUsername()).orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Shipper profile not found")
+        UserProfile profile = userProfileRepository.findByAuthenticationId(user.getId()).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User profile not found")
         );
-        return profileMapper.toShipperProfileResponse(profile);
+        return profileMapper.toUserProfileResponse(profile);
     }
 
-    public ShipperProfileResponse getShipperProfile(Long shipperId){
-        var profile = shipperProfileRepository.findById(shipperId).orElseThrow(
-                ()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "Shipper profile not found with id: " + shipperId)
+    public UserProfileResponse getUserProfile(Long userProfileId) {
+        var profile = userProfileRepository.findByProfileId(userProfileId).orElseThrow(
+                ()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "User profile not found with id: " + userProfileId)
         );
-        return profileMapper.toShipperProfileResponse(profile);
+        return profileMapper.toUserProfileResponse(profile);
     }
 
-    private Address buildAddress(CreateShipperProfileRequest request) {
+    private Address buildAddress(CreateUserProfileRequest request) {
         Address address = new Address();
         address.setStreet(request.getStreet());
         address.setCity(request.getCity());
@@ -122,7 +120,7 @@ public class ShipperProfileService {
         return address;
     }
 
-    private boolean hasAddressUpdate(UpdateShipperProfileRequest request) {
+    private boolean hasAddressUpdate(UpdateUserProfileRequest request) {
         return (request.getStreet() != null && !request.getStreet().isBlank())
                 || (request.getCity() != null && !request.getCity().isBlank())
                 || (request.getState() != null && !request.getState().isBlank())
@@ -131,7 +129,7 @@ public class ShipperProfileService {
                 || (request.getPhoneNumber() != null && !request.getPhoneNumber().isBlank());
     }
 
-    private void applyAddressUpdate(Address address, UpdateShipperProfileRequest request) {
+    private void applyAddressUpdate(Address address, UpdateUserProfileRequest request) {
         if (request.getStreet() != null && !request.getStreet().isBlank()) {
             address.setStreet(request.getStreet());
         }

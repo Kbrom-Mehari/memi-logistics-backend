@@ -1,9 +1,9 @@
 package com.memilogistics.shipmentservice.shipment.entity;
 
-import com.memilogistics.shipmentservice.carriercompany.entity.CarrierCompany;
+import com.memilogistics.shipmentservice.companyprofile.entity.CompanyProfile;
 import com.memilogistics.shipmentservice.payment.entity.PaymentRecord;
 import com.memilogistics.shipmentservice.shipment.enums.ShipmentStatus;
-import com.memilogistics.shipmentservice.shipperprofile.entity.ShipperProfile;
+import com.memilogistics.shipmentservice.userprofile.entity.UserProfile;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -72,11 +72,11 @@ public class Shipment {
 
     @ManyToOne()
     @JoinColumn(name = "shipper_profile_id")
-    private ShipperProfile shipper;
+    private UserProfile shipper;
 
     @ManyToOne()
     @JoinColumn(name = "assigned_carrier_id")
-    private CarrierCompany assignedCarrier;
+    private CompanyProfile assignedCarrier;
 
     @OneToMany(
             mappedBy = "shipment",

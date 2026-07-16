@@ -52,16 +52,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         //Build authenticated principal.
         CustomUserPrincipal principal =
                 new CustomUserPrincipal(
-                        claims.getUsername(),
-                        claims.getRoles()
+                        claims.getUserId(),
+                        claims.getEmail(),
+                        claims.getAuthorities()
                 );
 
-        //Convert roles to Spring Security authorities.
-        List<SimpleGrantedAuthority> authorities = claims.getRoles().stream()
-                .map(role -> {
-                    String authority = role.startsWith("ROLE_") ? role : "ROLE_" + role;
-                    return new SimpleGrantedAuthority(authority);
-                })
+        //Convert string list of authorities to Spring Security authorities.
+        List<SimpleGrantedAuthority> authorities = claims.getAuthorities().stream()
+                .map(SimpleGrantedAuthority::new)
                 .toList();
 
         //Create authentication object with principal and authorities.

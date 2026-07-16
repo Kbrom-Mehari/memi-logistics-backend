@@ -1,4 +1,4 @@
-package com.memilogistics.shipmentservice.carriercompany.dto;
+package com.memilogistics.shipmentservice.companyprofile.dto;
 
 import jakarta.validation.constraints.Email;
 import lombok.Getter;
@@ -6,7 +6,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class UpdateCarrierProfileRequest {
+public class UpdateCompanyProfileRequest {
     private String companyName;
     @Email(message = "Company email must be valid")
     private String companyEmail;

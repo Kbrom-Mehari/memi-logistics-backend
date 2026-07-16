@@ -5,13 +5,14 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.Collection;
+import java.util.List;
 
 @Builder
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
 public class TokenClaims {
-    private String username;
-    private Collection<String> roles;
+    private String userId;
+    private String email;
+    private List<String> authorities;
 }

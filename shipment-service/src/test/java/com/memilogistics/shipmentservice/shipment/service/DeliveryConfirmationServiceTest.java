@@ -1,9 +1,9 @@
-package com.memilogistics.shipmentservice.service;
+package com.memilogistics.shipmentservice.shipment.service;
 
 import com.memilogistics.shipmentservice.shipment.entity.DeliveryConfirmation;
 import com.memilogistics.shipmentservice.shipment.entity.Shipment;
 import com.memilogistics.shipmentservice.shipment.service.DeliveryConfirmationService;
-import com.memilogistics.shipmentservice.shipperprofile.entity.ShipperProfile;
+import com.memilogistics.shipmentservice.userprofile.entity.UserProfile;
 import com.memilogistics.shipmentservice.shipment.enums.ShipmentStatus;
 import com.memilogistics.shipmentservice.shipment.repository.DeliveryConfirmationRepository;
 import com.memilogistics.shipmentservice.shipment.repository.ShipmentRepository;
@@ -36,12 +36,12 @@ public class DeliveryConfirmationServiceTest {
 
     private Shipment sampleShipment;
     private DeliveryConfirmation sampleConfirmation;
-    private ShipperProfile sampleShipper;
+    private UserProfile sampleShipper;
 
     @BeforeEach
     void setUp() {
-        sampleShipper = new ShipperProfile();
-        sampleShipper.setId(10L);
+        sampleShipper = new UserProfile();
+        sampleShipper.setProfileId(10L);
         sampleShipper.setFirstName("John");
         sampleShipper.setLastName("Doe");
 
@@ -69,7 +69,7 @@ public class DeliveryConfirmationServiceTest {
         assertEquals("Received in good condition", sampleConfirmation.getNote());
 
         assertFalse(sampleShipment.getShipmentEvents().isEmpty());
-        assertEquals("Delivery confirmed by shipper", sampleShipment.getShipmentEvents().get(0).getDescription());
+        assertEquals("Delivery confirmed by shipper", sampleShipment.getShipmentEvents().getFirst().getDescription());
     }
 
     @Test
@@ -90,6 +90,7 @@ public class DeliveryConfirmationServiceTest {
         ResponseStatusException exception = assertThrows(ResponseStatusException.class,
                 () -> deliveryConfirmationService.confirmDelivery(1L, Optional.empty()));
         assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
+        assert exception.getReason() != null;
         assertTrue(exception.getReason().contains("Shipment not found"));
     }
 
@@ -101,6 +102,7 @@ public class DeliveryConfirmationServiceTest {
         ResponseStatusException exception = assertThrows(ResponseStatusException.class,
                 () -> deliveryConfirmationService.confirmDelivery(1L, Optional.empty()));
         assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusCode());
+        assert exception.getReason() != null;
         assertTrue(exception.getReason().contains("already completed"));
     }
 
@@ -112,6 +114,7 @@ public class DeliveryConfirmationServiceTest {
         ResponseStatusException exception = assertThrows(ResponseStatusException.class,
                 () -> deliveryConfirmationService.confirmDelivery(1L, Optional.empty()));
         assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusCode());
+        assert exception.getReason() != null;
         assertTrue(exception.getReason().contains("must be DELIVERED"));
     }
 
@@ -123,6 +126,7 @@ public class DeliveryConfirmationServiceTest {
         ResponseStatusException exception = assertThrows(ResponseStatusException.class,
                 () -> deliveryConfirmationService.confirmDelivery(1L, Optional.empty()));
         assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
+        assert exception.getReason() != null;
         assertTrue(exception.getReason().contains("DeliveryConfirmation not found"));
     }
 
@@ -134,6 +138,7 @@ public class DeliveryConfirmationServiceTest {
         ResponseStatusException exception = assertThrows(ResponseStatusException.class,
                 () -> deliveryConfirmationService.confirmDelivery(1L, Optional.empty()));
         assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusCode());
+        assert exception.getReason() != null;
         assertTrue(exception.getReason().contains("Delivery is already confirmed"));
     }
 }

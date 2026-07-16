@@ -83,5 +83,3 @@ public class PasswordResetService {
         return base + "?token=" + token;
     }
 }
-
-//http://localhost:3000/reset-password?token=abc123def456ghi789jkl012mno345pq678rst901uvwx234yz567890ab12

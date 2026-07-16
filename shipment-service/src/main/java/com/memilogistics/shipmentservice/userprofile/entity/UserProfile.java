@@ -1,6 +1,7 @@
-package com.memilogistics.shipmentservice.shipperprofile.entity;
+package com.memilogistics.shipmentservice.userprofile.entity;
 
 import com.memilogistics.shipmentservice.address.entity.Address;
+import com.memilogistics.shipmentservice.companyprofile.entity.CompanyProfile;
 import com.memilogistics.shipmentservice.shipment.entity.Shipment;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
@@ -14,21 +15,20 @@ import java.util.List;
 @Entity
 @Getter
 @Setter
-public class ShipperProfile {
+@Table(name = "user_profile")
+public class UserProfile {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long profileId;
 
-    @Email
     @Column(unique = true, nullable = false)
-    private String authenticationEmail; //should be auth email
+    private String authenticationId; //should be auth id
 
     @NotBlank
     private String firstName;
     @NotBlank
     private String lastName;
-    @NotBlank
-    private String companyName;
+
     @NotBlank
     private String businessName;
     @OneToOne(orphanRemoval = true, fetch = FetchType.LAZY)
@@ -40,5 +40,5 @@ public class ShipperProfile {
             orphanRemoval = true,
             cascade = CascadeType.ALL
     )
-    private List<Shipment> shipments = new ArrayList<>();
+    private List<Shipment> loads = new ArrayList<>();
 }

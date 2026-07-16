@@ -1,4 +1,4 @@
-package com.memilogistics.shipmentservice.shipperprofile.dto;
+package com.memilogistics.shipmentservice.userprofile.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
@@ -6,13 +6,11 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class CreateShipperProfileRequest {
+public class CreateUserProfileRequest {
     @NotBlank(message = "First name is required")
     private String firstName;
     @NotBlank(message = "Last name is required")
     private String lastName;
-    @NotBlank(message = "Company name is required")
-    private String companyName;
     @NotBlank(message = "Business name is required")
     private String businessName;
 

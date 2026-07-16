@@ -4,14 +4,14 @@ import com.memilogistics.commonsecurity.annotation.CurrentUser;
 import com.memilogistics.commonsecurity.principal.CustomUserPrincipal;
 import com.memilogistics.shipmentservice.shipment.dto.ShipmentResponse;
 import com.memilogistics.shipmentservice.shipment.dto.StatusUpdateRequest;
-import com.memilogistics.shipmentservice.carriercompany.entity.CarrierCompany;
+import com.memilogistics.shipmentservice.companyprofile.entity.CompanyProfile;
 import com.memilogistics.shipmentservice.shipment.entity.DeliveryConfirmation;
 import com.memilogistics.shipmentservice.shipment.entity.Shipment;
 import com.memilogistics.shipmentservice.shipment.entity.ShipmentEvent;
 import com.memilogistics.shipmentservice.shipment.enums.ShipmentStatus;
 import com.memilogistics.shipmentservice.exception.InvalidShipmentStatusTransitionException;
 import com.memilogistics.shipmentservice.shipment.mapper.ShipmentMapper;
-import com.memilogistics.shipmentservice.carriercompany.repository.CarrierCompanyRepository;
+import com.memilogistics.shipmentservice.companyprofile.repository.CompanyProfileRepository;
 import com.memilogistics.shipmentservice.shipment.repository.ShipmentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -25,7 +25,7 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class ShipmentStatusService {
     private final ShipmentRepository shipmentRepository;
-    private final CarrierCompanyRepository carrierCompanyRepository;
+    private final CompanyProfileRepository carrierCompanyRepository;
     private final ShipmentMapper shipmentMapper;
 
     @Transactional
@@ -41,7 +41,7 @@ public class ShipmentStatusService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "COMPLETED status cannot be manually set");
         }
 
-        CarrierCompany carrierCompany = carrierCompanyRepository.findByAuthenticationEmail(user.getUsername())
+        CompanyProfile carrierCompany = carrierCompanyRepository.findByAuthenticationId(user.getId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Carrier company not found"));
 
         Shipment shipment = shipmentRepository.findById(shipmentId)
@@ -54,7 +54,7 @@ public class ShipmentStatusService {
             );
         }
 
-        if(!carrierCompany.getId().equals(shipment.getAssignedCarrier().getId())){
+        if(!carrierCompany.getCompanyProfileId().equals(shipment.getAssignedCarrier().getCompanyProfileId())){
             throw new ResponseStatusException(
                     HttpStatus.FORBIDDEN,
                     "You are not assigned to this shipment");
@@ -103,7 +103,7 @@ public class ShipmentStatusService {
         shipmentEvent.setEventTimestamp(LocalDateTime.now());
         return shipmentEvent;
     }
-    private DeliveryConfirmation createDeliveryConfirmation(CarrierCompany carrierCompany){
+    private DeliveryConfirmation createDeliveryConfirmation(CompanyProfile carrierCompany){
         DeliveryConfirmation deliveryConfirmation = new DeliveryConfirmation();
         deliveryConfirmation.setCarrierConfirmed(true);
         deliveryConfirmation.setCarrierConfirmedAt(LocalDateTime.now());

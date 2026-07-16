@@ -1,5 +1,8 @@
 package com.memilogistics.authservice.security;
 
+import com.memilogistics.authservice.entity.User;
+import com.memilogistics.authservice.enums.Permissions;
+import com.memilogistics.authservice.enums.Role;
 import com.memilogistics.commonsecurity.config.JwtProperties;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
@@ -8,13 +11,14 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.verify;
@@ -24,30 +28,32 @@ import static org.mockito.Mockito.when;
 class JwtServiceTest {
 
     private JwtService jwtService;
-    private UserDetails userDetails;
+    private CustomUserDetails userDetails;
+    private User user ;
 
     @Mock
-    private UserDetailsService userDetailsService;
+    private CustomUserDetailsService userDetailsService;
 
     @BeforeEach
     void setUp() {
         JwtProperties properties = new JwtProperties();
         properties.setSecretKey(base64Secret());
         properties.setExpiration(60_000L);
-
-        jwtService = new JwtService(properties);
-        userDetails = User.withUsername("admin@memi.com")
-                .password("encoded-password")
-                .authorities("ROLE_ADMIN")
+        user = User.builder().id("721a3648-5249-43c2-ad62-cd73e89fb2bb")
+                .email("admin@example.com")
+                .roles(Set.of(Role.ADMIN))
+                .permissions(Set.of(Permissions.CREATE_LOAD))
                 .build();
+        jwtService = new JwtService(properties);
+        userDetails = new CustomUserDetails(user);
     }
 
     @Test
-    void generateToken_ShouldCreateTokenAndExtractUsername() {
+    void generateToken_ShouldCreateTokenAndExtractUserId() {
         String token = jwtService.generateToken(userDetails);
 
         assertNotNull(token);
-        assertEquals("admin@memi.com", jwtService.extractUsername(token));
+        assertEquals("721a3648-5249-43c2-ad62-cd73e89fb2bb", jwtService.extractUserId(token));
     }
 
     @Test
@@ -69,17 +75,19 @@ class JwtServiceTest {
     @Test
     void isTokenValid_ShouldReturnFalseForDifferentUser() {
         String token = jwtService.generateToken(userDetails);
-        UserDetails differentUser = User.withUsername("other@memi.com")
+        CustomUserDetails differentUser = new CustomUserDetails(User.builder().id("other-id")
+                .email("admin@example.com")
                 .password("encoded-password")
-                .authorities("ROLE_ADMIN")
-                .build();
+                .roles(Set.of(Role.USER))
+                .permissions(Set.of(Permissions.CREATE_LOAD))
+                .build());
 
         assertFalse(jwtService.isTokenValid(token, differentUser));
     }
 
     @Test
-    void extractUsername_ShouldThrowForMalformedToken() {
-        assertThrows(JwtException.class, () -> jwtService.extractUsername("not-a-jwt"));
+    void extractUserId_ShouldThrowForMalformedToken() {
+        assertThrows(JwtException.class, () -> jwtService.extractUserId("not-a-jwt"));
     }
 
     @Test
@@ -97,12 +105,12 @@ class JwtServiceTest {
     @Test
     void isTokenValid_ShouldWorkWithUserLoadedFromUserDetailsService() {
         String token = jwtService.generateToken(userDetails);
-        when(userDetailsService.loadUserByUsername("admin@memi.com")).thenReturn(userDetails);
+        when(userDetailsService.loadUserByUserId("721a3648-5249-43c2-ad62-cd73e89fb2bb")).thenReturn(userDetails);
 
-        UserDetails loadedUser = userDetailsService.loadUserByUsername(jwtService.extractUsername(token));
+        CustomUserDetails loadedUser = userDetailsService.loadUserByUserId(jwtService.extractUserId(token));
 
         assertTrue(jwtService.isTokenValid(token, loadedUser));
-        verify(userDetailsService).loadUserByUsername("admin@memi.com");
+        verify(userDetailsService).loadUserByUserId("721a3648-5249-43c2-ad62-cd73e89fb2bb");
     }
 
     private String base64Secret() {

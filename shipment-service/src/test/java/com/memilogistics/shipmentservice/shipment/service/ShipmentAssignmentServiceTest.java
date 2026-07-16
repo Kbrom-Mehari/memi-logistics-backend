@@ -1,11 +1,13 @@
-package com.memilogistics.shipmentservice.service;
+package com.memilogistics.shipmentservice.shipment.service;
 
 import com.memilogistics.commonsecurity.principal.CustomUserPrincipal;
-import com.memilogistics.shipmentservice.carriercompany.entity.CarrierCompany;
+import com.memilogistics.shipmentservice.companyprofile.entity.CompanyProfile;
+import com.memilogistics.shipmentservice.userprofile.entity.UserProfile;
+import com.memilogistics.shipmentservice.shipment.dto.ShipmentOfferRequest;
 import com.memilogistics.shipmentservice.shipment.entity.Shipment;
 import com.memilogistics.shipmentservice.shipment.entity.ShipmentOffer;
 import com.memilogistics.shipmentservice.shipment.enums.ShipmentStatus;
-import com.memilogistics.shipmentservice.carriercompany.repository.CarrierCompanyRepository;
+import com.memilogistics.shipmentservice.companyprofile.repository.CompanyProfileRepository;
 import com.memilogistics.shipmentservice.shipment.repository.ShipmentOfferRepository;
 import com.memilogistics.shipmentservice.shipment.repository.ShipmentRepository;
 import com.memilogistics.shipmentservice.shipment.service.ShipmentAssignmentService;
@@ -37,15 +39,16 @@ public class ShipmentAssignmentServiceTest {
     private ShipmentRepository shipmentRepository;
 
     @Mock
-    private CarrierCompanyRepository carrierCompanyRepository;
+    private CompanyProfileRepository carrierCompanyRepository;
 
     @InjectMocks
     private ShipmentAssignmentService shipmentAssignmentService;
 
     private Shipment sampleShipment;
-    private CarrierCompany sampleCarrier;
+    private CompanyProfile sampleCarrier;
     private ShipmentOffer sampleOffer;
     private CustomUserPrincipal sampleUser;
+    private ShipmentOfferRequest offerRequest;
 
     @BeforeEach
     void setUp() {
@@ -54,15 +57,26 @@ public class ShipmentAssignmentServiceTest {
         sampleShipment.setStatus(ShipmentStatus.PENDING);
         sampleShipment.setShipmentOffers(new ArrayList<>());
 
-        sampleCarrier = new CarrierCompany();
-        sampleCarrier.setId(10L);
+        sampleCarrier = new CompanyProfile();
+        sampleCarrier.setCompanyProfileId(10L);
         sampleCarrier.setCompanyName("Express Logistics");
         sampleCarrier.setOfferedShipments(new ArrayList<>());
+
+        // set a shipper profile on the sample shipment so production code can read its authentication id
+        UserProfile shipperProfile = new UserProfile();
+        shipperProfile.setAuthenticationId("shipper@memi.com");
+        sampleShipment.setShipper(shipperProfile);
 
         sampleOffer = new ShipmentOffer();
         sampleOffer.setId(100L);
         sampleOffer.setShipment(sampleShipment);
         sampleOffer.setCarrierCompany(sampleCarrier);
+
+        // initialize the request used by tests
+        offerRequest = new ShipmentOfferRequest();
+        offerRequest.setShipmentId(1L);
+        offerRequest.setPrice(new BigDecimal("150.00"));
+        offerRequest.setCurrencyCode("USD");
 
         sampleUser = new CustomUserPrincipal("manager@express.com", List.of("ROLE_CARRIER"));
     }
@@ -70,10 +84,10 @@ public class ShipmentAssignmentServiceTest {
     @Test
     void offerShipment_ShouldCreateOfferAndSave() {
         when(shipmentRepository.findById(1L)).thenReturn(Optional.of(sampleShipment));
-        when(carrierCompanyRepository.findByAuthenticationEmail(sampleUser.getUsername()))
+        when(carrierCompanyRepository.findByAuthenticationId(sampleUser.getId()))
                 .thenReturn(Optional.of(sampleCarrier));
 
-        shipmentAssignmentService.offerShipment(1L, sampleUser, new BigDecimal("150.00"));
+        shipmentAssignmentService.offerShipment(sampleUser, offerRequest);
 
         assertEquals(ShipmentStatus.ACCEPTED, sampleShipment.getStatus());
         assertEquals(1, sampleShipment.getShipmentOffers().size());
@@ -86,9 +100,9 @@ public class ShipmentAssignmentServiceTest {
         when(shipmentRepository.findById(1L)).thenReturn(Optional.empty());
 
         ResponseStatusException exception = assertThrows(ResponseStatusException.class,
-                () -> shipmentAssignmentService.offerShipment(1L, sampleUser, BigDecimal.TEN));
+                () -> shipmentAssignmentService.offerShipment(sampleUser, offerRequest));
         assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
-        verify(carrierCompanyRepository, never()).findByAuthenticationEmail(anyString());
+        verify(carrierCompanyRepository, never()).findByAuthenticationId(anyString());
     }
 
     @Test
@@ -98,7 +112,7 @@ public class ShipmentAssignmentServiceTest {
         sampleShipment.setStatus(ShipmentStatus.ACCEPTED);
 
         when(shipmentOfferRepository.findById(100L)).thenReturn(Optional.of(sampleOffer));
-        when(carrierCompanyRepository.findByAuthenticationEmail(sampleUser.getUsername()))
+        when(carrierCompanyRepository.findByAuthenticationId(sampleUser.getId()))
                 .thenReturn(Optional.of(sampleCarrier));
 
         shipmentAssignmentService.cancelShipmentOffer(100L, sampleUser);
@@ -111,11 +125,11 @@ public class ShipmentAssignmentServiceTest {
 
     @Test
     void cancelShipmentOffer_ShouldThrowException_WhenCarrierDoesNotMatch() {
-        CarrierCompany differentCarrier = new CarrierCompany();
-        differentCarrier.setId(99L);
+        CompanyProfile differentCarrier = new CompanyProfile();
+        differentCarrier.setCompanyProfileId(99L);
 
         when(shipmentOfferRepository.findById(100L)).thenReturn(Optional.of(sampleOffer));
-        when(carrierCompanyRepository.findByAuthenticationEmail(sampleUser.getUsername()))
+        when(carrierCompanyRepository.findByAuthenticationId(sampleUser.getId()))
                 .thenReturn(Optional.of(differentCarrier));
 
         ResponseStatusException exception = assertThrows(ResponseStatusException.class,

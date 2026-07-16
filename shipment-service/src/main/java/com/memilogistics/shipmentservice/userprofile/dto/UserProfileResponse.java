@@ -1,14 +1,13 @@
-package com.memilogistics.shipmentservice.shipperprofile.dto;
+package com.memilogistics.shipmentservice.userprofile.dto;
 
 import lombok.Data;
 
 @Data
-public class ShipperProfileResponse {
+public class UserProfileResponse {
     private Long id;
-    private String email;
+    private String authenticationId;
     private String firstName;
     private String lastName;
-    private String companyName;
     private String businessName;
     private String street;
     private String city;

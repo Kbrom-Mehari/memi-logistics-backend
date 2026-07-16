@@ -1,14 +1,14 @@
-package com.memilogistics.shipmentservice.service;
+package com.memilogistics.shipmentservice.shipment.service;
 
 import com.memilogistics.shipmentservice.payment.dto.PaymentRequest;
-import com.memilogistics.shipmentservice.carriercompany.entity.CarrierCompany;
+import com.memilogistics.shipmentservice.companyprofile.entity.CompanyProfile;
 import com.memilogistics.shipmentservice.payment.entity.PaymentRecord;
 import com.memilogistics.shipmentservice.payment.service.PaymentRecordService;
 import com.memilogistics.shipmentservice.shipment.entity.Shipment;
 import com.memilogistics.shipmentservice.payment.enums.PaymentMethod;
 import com.memilogistics.shipmentservice.shipment.enums.ShipmentStatus;
 import com.memilogistics.commonsecurity.principal.CustomUserPrincipal;
-import com.memilogistics.shipmentservice.carriercompany.repository.CarrierCompanyRepository;
+import com.memilogistics.shipmentservice.companyprofile.repository.CompanyProfileRepository;
 import com.memilogistics.shipmentservice.shipment.repository.ShipmentRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -34,25 +34,25 @@ public class PaymentRecordServiceTest {
     private ShipmentRepository shipmentRepository;
 
     @Mock
-    private CarrierCompanyRepository carrierCompanyRepository;
+    private CompanyProfileRepository carrierCompanyRepository;
 
     @InjectMocks
     private PaymentRecordService paymentRecordService;
 
     private Shipment sampleShipment;
-    private CarrierCompany sampleCarrier;
+    private CompanyProfile sampleCarrier;
     private PaymentRequest paymentRequest;
     private PaymentRecord samplePaymentRecord;
     private CustomUserPrincipal mockPrincipal;
 
     @BeforeEach
     void setUp() {
-        sampleCarrier = new CarrierCompany();
-        sampleCarrier.setId(10L);
+        sampleCarrier = new CompanyProfile();
+        sampleCarrier.setCompanyProfileId(10L);
         sampleCarrier.setCompanyName("Express Freight");
 
         mockPrincipal = mock(CustomUserPrincipal.class);
-        lenient().when(mockPrincipal.getUsername()).thenReturn("carrier@test.com");
+        lenient().when(mockPrincipal.getId()).thenReturn("721a3648-5249-43c2-ad62-cd73e89fb2bb");
 
         sampleShipment = new Shipment();
         sampleShipment.setId(1L);
@@ -105,6 +105,7 @@ public class PaymentRecordServiceTest {
         ResponseStatusException exception = assertThrows(ResponseStatusException.class,
                 () -> paymentRecordService.initiatePayment(1L, paymentRequest));
         assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusCode());
+        assert exception.getReason() != null;
         assertTrue(exception.getReason().contains("Shipment must be DELIVERED"));
     }
 
@@ -116,13 +117,14 @@ public class PaymentRecordServiceTest {
         ResponseStatusException exception = assertThrows(ResponseStatusException.class,
                 () -> paymentRecordService.initiatePayment(1L, paymentRequest));
         assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusCode());
+        assert exception.getReason() != null;
         assertTrue(exception.getReason().contains("Payment already initiated"));
     }
 
     @Test
     void confirmPayment_ShouldSucceed_WhenValid() {
         sampleShipment.setPaymentRecord(samplePaymentRecord);
-        when(carrierCompanyRepository.findByAuthenticationEmail("carrier@test.com")).thenReturn(Optional.of(sampleCarrier));
+        when(carrierCompanyRepository.findByAuthenticationId("721a3648-5249-43c2-ad62-cd73e89fb2bb")).thenReturn(Optional.of(sampleCarrier));
         when(shipmentRepository.findById(1L)).thenReturn(Optional.of(sampleShipment));
 
         paymentRecordService.confirmPayment(1L, mockPrincipal);
@@ -136,7 +138,7 @@ public class PaymentRecordServiceTest {
 
     @Test
     void confirmPayment_ShouldThrowException_WhenShipmentNotFound() {
-        when(carrierCompanyRepository.findByAuthenticationEmail("carrier@test.com")).thenReturn(Optional.of(sampleCarrier));
+        when(carrierCompanyRepository.findByAuthenticationId("721a3648-5249-43c2-ad62-cd73e89fb2bb")).thenReturn(Optional.of(sampleCarrier));
         when(shipmentRepository.findById(1L)).thenReturn(Optional.empty());
 
         ResponseStatusException exception = assertThrows(ResponseStatusException.class,
@@ -147,38 +149,41 @@ public class PaymentRecordServiceTest {
     @Test
     void confirmPayment_ShouldThrowException_WhenNoAssignedCarrier() {
         sampleShipment.setAssignedCarrier(null);
-        when(carrierCompanyRepository.findByAuthenticationEmail("carrier@test.com")).thenReturn(Optional.of(sampleCarrier));
+        when(carrierCompanyRepository.findByAuthenticationId("721a3648-5249-43c2-ad62-cd73e89fb2bb")).thenReturn(Optional.of(sampleCarrier));
         when(shipmentRepository.findById(1L)).thenReturn(Optional.of(sampleShipment));
 
         ResponseStatusException exception = assertThrows(ResponseStatusException.class,
                 () -> paymentRecordService.confirmPayment(1L, mockPrincipal));
         assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusCode());
+        assert exception.getReason() != null;
         assertTrue(exception.getReason().contains("Shipment has no assigned carrier"));
     }
 
     @Test
     void confirmPayment_ShouldThrowException_WhenWrongCarrier() {
-        CarrierCompany wrongCarrier = new CarrierCompany();
-        wrongCarrier.setId(99L);
+        CompanyProfile wrongCarrier = new CompanyProfile();
+        wrongCarrier.setCompanyProfileId(99L);
         sampleShipment.setAssignedCarrier(wrongCarrier);
-        when(carrierCompanyRepository.findByAuthenticationEmail("carrier@test.com")).thenReturn(Optional.of(sampleCarrier));
+        when(carrierCompanyRepository.findByAuthenticationId("721a3648-5249-43c2-ad62-cd73e89fb2bb")).thenReturn(Optional.of(sampleCarrier));
         when(shipmentRepository.findById(1L)).thenReturn(Optional.of(sampleShipment));
 
         ResponseStatusException exception = assertThrows(ResponseStatusException.class,
                 () -> paymentRecordService.confirmPayment(1L, mockPrincipal));
         assertEquals(HttpStatus.FORBIDDEN, exception.getStatusCode());
+        assert exception.getReason() != null;
         assertTrue(exception.getReason().contains("Carrier not assigned to this shipment"));
     }
 
     @Test
     void confirmPayment_ShouldThrowException_WhenPaymentNotInitiated() {
         sampleShipment.setPaymentRecord(null); // No payment record
-        when(carrierCompanyRepository.findByAuthenticationEmail("carrier@test.com")).thenReturn(Optional.of(sampleCarrier));
+        when(carrierCompanyRepository.findByAuthenticationId("721a3648-5249-43c2-ad62-cd73e89fb2bb")).thenReturn(Optional.of(sampleCarrier));
         when(shipmentRepository.findById(1L)).thenReturn(Optional.of(sampleShipment));
 
         ResponseStatusException exception = assertThrows(ResponseStatusException.class,
                 () -> paymentRecordService.confirmPayment(1L, mockPrincipal));
         assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusCode());
+        assert exception.getReason() != null;
         assertTrue(exception.getReason().contains("Payment is not initiated"));
     }
 
@@ -186,12 +191,13 @@ public class PaymentRecordServiceTest {
     void confirmPayment_ShouldThrowException_WhenNotShipperConfirmed() {
         samplePaymentRecord.setShipperConfirmed(false);
         sampleShipment.setPaymentRecord(samplePaymentRecord);
-        when(carrierCompanyRepository.findByAuthenticationEmail("carrier@test.com")).thenReturn(Optional.of(sampleCarrier));
+        when(carrierCompanyRepository.findByAuthenticationId("721a3648-5249-43c2-ad62-cd73e89fb2bb")).thenReturn(Optional.of(sampleCarrier));
         when(shipmentRepository.findById(1L)).thenReturn(Optional.of(sampleShipment));
 
         ResponseStatusException exception = assertThrows(ResponseStatusException.class,
                 () -> paymentRecordService.confirmPayment(1L, mockPrincipal));
         assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusCode());
+        assert exception.getReason() != null;
         assertTrue(exception.getReason().contains("Payment not initiated by shipper"));
     }
 
@@ -199,12 +205,13 @@ public class PaymentRecordServiceTest {
     void confirmPayment_ShouldThrowException_WhenAlreadyCarrierConfirmed() {
         samplePaymentRecord.setCarrierConfirmed(true);
         sampleShipment.setPaymentRecord(samplePaymentRecord);
-        when(carrierCompanyRepository.findByAuthenticationEmail("carrier@test.com")).thenReturn(Optional.of(sampleCarrier));
+        when(carrierCompanyRepository.findByAuthenticationId("721a3648-5249-43c2-ad62-cd73e89fb2bb")).thenReturn(Optional.of(sampleCarrier));
         when(shipmentRepository.findById(1L)).thenReturn(Optional.of(sampleShipment));
 
         ResponseStatusException exception = assertThrows(ResponseStatusException.class,
                 () -> paymentRecordService.confirmPayment(1L, mockPrincipal));
         assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusCode());
+        assert exception.getReason() != null;
         assertTrue(exception.getReason().contains("Payment is already confirmed by carrier"));
     }
 }

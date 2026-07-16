@@ -22,12 +22,16 @@ public class JwtTokenProvider {
         this.jwtSecret = properties.getSecretKey();
     }
 
-    public String extractUsername(String token) {
+    public String extractUserId(String token) {
         return extractClaim(token, Claims::getSubject);
     }
 
-    public List<String> extractRoles(String token) {
-        return extractClaim(token, claims -> claims.get("roles", List.class));
+    public List<String> extractAuthorities(String token) {
+        return extractClaim(token, claims -> claims.get("authorities", List.class));
+    }
+
+    public String extractEmail(String token) {
+        return extractClaim(token, claims -> claims.get("email", String.class));
     }
 
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
@@ -35,9 +39,9 @@ public class JwtTokenProvider {
         return claimsResolver.apply(claims);
     }
     public TokenClaims extractTokenClaims(String token) {
-        return TokenClaims.builder()
-                .username(extractUsername(token))
-                .roles(extractRoles(token))
+        return TokenClaims.builder().userId(extractUserId(token))
+                .email(extractEmail(token))
+                .authorities(extractAuthorities(token))
                 .build();
     }
 
